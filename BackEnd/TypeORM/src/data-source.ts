@@ -4,7 +4,6 @@ import { Usuario } from "./entity/Usuario";
 import { Carteira } from "./entity/Carteira";
 import dotenv from 'dotenv';
 
-// Carregar as variáveis de ambiente do arquivo .env
 dotenv.config();
 
 console.log({

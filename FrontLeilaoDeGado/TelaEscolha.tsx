@@ -3,13 +3,14 @@ import { StyleSheet, View, Text, TouchableOpacity, Image } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from './App';
 
-type EscolhaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Escolha'>;
+type EscolhaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Escolha'>; // Define o tipo de navegação para a tela Escolha
 
 type Props = {
-  navigation: EscolhaScreenNavigationProp;
+  navigation: EscolhaScreenNavigationProp; // Prop para navegação
 };
 
 const TelaEscolha: React.FC<Props> = ({ navigation }) => {
+  // Retorno do JSX que define a interface do usuário para a tela de escolha
   return (
     <View style={styles.container}>
       <Text style={styles.welcomeText}>Bem vindo!</Text>

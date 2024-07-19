@@ -5,25 +5,27 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from './App';
 import { useWalletConnectModal } from '@walletconnect/modal-react-native';
 
-type CarteiraScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Carteira'>;
-type CarteiraScreenRouteProp = RouteProp<RootStackParamList, 'Carteira'>;
+type CarteiraScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Carteira'>; // Define o tipo de navegação para a tela Carteira
+type CarteiraScreenRouteProp = RouteProp<RootStackParamList, 'Carteira'>; // Define o tipo de rota para a tela Carteira
 
 type Props = {
-  navigation: CarteiraScreenNavigationProp;
-  route: CarteiraScreenRouteProp;
+  navigation: CarteiraScreenNavigationProp; // Prop para navegação
+  route: CarteiraScreenRouteProp; // Prop para a rota
 };
 
 const TelaCarteira: React.FC<Props> = ({ navigation, route }) => {
-  const { address } = route.params;
-  const { provider, open, isConnected } = useWalletConnectModal();
+  const { address } = route.params; // Obtém o parâmetro 'address' da rota
+  const { provider, open, isConnected } = useWalletConnectModal(); // Hooks do WalletConnect para gerenciar o estado da conexão
 
+  // Função para lidar com a desconexão
   const handleDisconnect = async () => {
     if (provider) {
-      await provider.disconnect();
-      navigation.navigate('BoasVindas');
+      await provider.disconnect(); // Desconecta o provedor
+      navigation.navigate('BoasVindas'); // Navega para a tela de boas-vindas
     }
   };
 
+  // Retorno do JSX que define a interface do usuário para a tela de carteira
   return (
     <View style={styles.container}>
       <View style={styles.card}>

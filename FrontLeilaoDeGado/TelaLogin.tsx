@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image } from 'react-native';
+import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from './App'; // Ajuste o caminho conforme necessário
+import { RootStackParamList } from './App';
+import api from './api/api';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
@@ -13,7 +14,39 @@ type Props = {
 };
 
 const TelaLogin: React.FC<Props> = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [senha, setSenha] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+
+  const handleLogin = async () => {
+    if (!email || !senha) {
+      Alert.alert('Erro', 'Por favor, preencha todos os campos');
+      return;
+    }
+
+    try {
+      const response = await api.post('/login', {
+        email: email,
+        senha: senha,
+      });
+      console.log('Usuário logado:', response.data);
+      Alert.alert('Sucesso', 'Login realizado com sucesso!');
+      navigation.navigate('BoasVindas');
+    } catch (error: any) { // Aqui especificamos o tipo 'any' para o erro
+      if (error.response) {
+        if (error.response.status === 404) {
+          Alert.alert('Erro', 'Usuário não encontrado');
+        } else if (error.response.status === 401) {
+          Alert.alert('Erro', 'Senha incorreta');
+        } else {
+          Alert.alert('Erro', 'Não foi possível fazer login');
+        }
+      } else {
+        Alert.alert('Erro', 'Erro de conexão com o servidor');
+      }
+      console.error('Erro ao fazer login:', error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -23,12 +56,16 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
         placeholder="Email"
         placeholderTextColor="#666"
         keyboardType="email-address"
+        value={email}
+        onChangeText={setEmail}
       />
       <TextInput
         style={styles.input}
         placeholder="Senha"
         placeholderTextColor="#666"
         secureTextEntry
+        value={senha}
+        onChangeText={setSenha}
       />
       <View style={styles.optionsContainer}>
         <View style={styles.rememberMeContainer}>
@@ -41,9 +78,9 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
           <Text style={styles.forgotPasswordText}>Esqueceu a senha?</Text>
         </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('BoasVindas')}>
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
         <View style={styles.gradient}>
-          <Text style={styles.buttonText}>Entrar</Text> 
+          <Text style={styles.buttonText}>Entrar</Text>
         </View>
       </TouchableOpacity>
       <View>
