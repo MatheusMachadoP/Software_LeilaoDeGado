@@ -6,14 +6,14 @@ import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 // Importa as suas entidades aqui
-import { Perfil } from "./Perfil";
-import { Usuario } from "./Usuario";
-import { UsuarioPerfil } from "./UsuarioPerfil";
-import { Leilao } from "./Leilao";
-import { Lance } from "./Lance";
-import { Transacao } from "./Transacao";
-import { HistoricoTransacao } from "./HistoricoTransacao";
-import { Logs } from "./Logs";
+import { Perfil } from "./entity/Perfil";
+import { Usuario } from "./entity/Usuario";
+import { UsuarioPerfil } from "./entity/UsuarioPerfil";
+import { Leilao } from "./entity/Leilao";
+import { Lance } from "./entity/Lance";
+import { Transacao } from "./entity/Transacao";
+import { HistoricoTransacao } from "./entity/HistoricoTransacao";
+import { Logs } from "./entity/Logs";
 
 // Verifica se as variáveis de ambiente foram carregadas corretamente
 if (!process.env.DB_HOST || !process.env.DB_PORT || !process.env.DB_USERNAME || !process.env.DB_PASSWORD || !process.env.DB_DATABASE) {
