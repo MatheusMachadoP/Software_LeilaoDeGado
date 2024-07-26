@@ -1,29 +1,44 @@
-import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { Usuario } from "./entity/Usuario";
-import { Carteira } from "./entity/Carteira";
-import dotenv from 'dotenv';
+import * as dotenv from "dotenv";
+import path from "path";
 
-dotenv.config();
+// Carrega as variáveis de ambiente do arquivo .env
+dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
-console.log({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  username: process.env.DB_USERNAME,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_DATABASE,
-});
+// Importa as suas entidades aqui
+import { Perfil } from "./Perfil";
+import { Usuario } from "./Usuario";
+import { UsuarioPerfil } from "./UsuarioPerfil";
+import { Leilao } from "./Leilao";
+import { Lance } from "./Lance";
+import { Transacao } from "./Transacao";
+import { HistoricoTransacao } from "./HistoricoTransacao";
+import { Logs } from "./Logs";
+
+// Verifica se as variáveis de ambiente foram carregadas corretamente
+if (!process.env.DB_HOST || !process.env.DB_PORT || !process.env.DB_USERNAME || !process.env.DB_PASSWORD || !process.env.DB_DATABASE) {
+  throw new Error("Variáveis de ambiente do banco de dados não configuradas.");
+}
 
 export const AppDataSource = new DataSource({
   type: "postgres",
   host: process.env.DB_HOST,
-  port: parseInt(process.env.DB_PORT || "5432"),
+  port: parseInt(process.env.DB_PORT, 10), // Converte a porta para número
   username: process.env.DB_USERNAME,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_DATABASE,
-  synchronize: true,
+  synchronize: false, // Desative em produção!
   logging: false,
-  entities: [Usuario, Carteira],
-  migrations: ["src/migration/*.ts"],
+  entities: [
+    Perfil,
+    Usuario,
+    UsuarioPerfil,
+    Leilao,
+    Lance,
+    Transacao,
+    HistoricoTransacao,
+    Logs,
+  ],
+  migrations: ["src/migrations/*.ts"],
   subscribers: [],
 });

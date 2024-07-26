@@ -1,31 +1,40 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-import { Carteira } from "./Carteira";
-
-// usando "!" vou dizer ao typescript que vou inicializar em algum momento
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Leilao } from './Leilao';
+import { Lance } from './Lance';
+import { UsuarioPerfil } from './UsuarioPerfil';
 
 @Entity()
 export class Usuario {
-  @PrimaryGeneratedColumn()
-  id!: number;
+    @PrimaryGeneratedColumn()
+    id: number | undefined;
 
-  @Column()
-  nome_completo!: string;
+    @Column()
+    nomeCompleto: string | undefined;
 
-  @Column()
-  email!: string;
+    @Column({ unique: true })
+    email: string | undefined;
 
-  @Column()
-  telefone!: string;
+    @Column({ nullable: true })
+    telefoneCelular?: string;
 
-  @Column()
-  cpf!: string;
+    @Column({ unique: true })
+    cpf: string | undefined;
 
-  @Column()
-  senha!: string;
+    @Column()
+    senha: string | undefined; // Certifique-se de armazenar hashes de senha!
 
-  @Column({ default: false })
-  remember_me!: boolean;
+    @Column({ nullable: true })
+    enderecoCarteira?: string;
 
-  @OneToMany(() => Carteira, carteira => carteira.usuario)
-  carteiras!: Carteira[];
+    @Column({ nullable: true })
+    foto?: string;
+
+    @OneToMany(() => Leilao, leilao => leilao.criador)
+    leiloesCriados: Leilao[] | undefined;
+
+    @OneToMany(() => Lance, lance => lance.usuario)
+    lances: Lance[] | undefined;
+
+    @OneToMany(() => UsuarioPerfil, usuarioPerfil => usuarioPerfil.usuario)
+    perfis: UsuarioPerfil[] | undefined;
 }
