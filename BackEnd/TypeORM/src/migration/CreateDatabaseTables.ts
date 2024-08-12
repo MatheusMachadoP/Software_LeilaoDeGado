@@ -5,10 +5,12 @@ export class CreateDatabaseTablesXXXXXXXXXXXXXX implements MigrationInterface {
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
+      CREATE TYPE status_leilao AS ENUM ('Aberto', 'Em Andamento', 'Finalizado');
+
       CREATE TABLE perfil (
         id SERIAL PRIMARY KEY,
         nome TEXT UNIQUE NOT NULL,
-        descricao TEXT -- Descrição do perfil (opcional)
+        descricao TEXT
       );
 
       INSERT INTO perfil (nome) VALUES ('Licitante'), ('Leiloeiro');
@@ -41,9 +43,9 @@ export class CreateDatabaseTablesXXXXXXXXXXXXXX implements MigrationInterface {
         descricao TEXT,
         foto TEXT,
         criador_id INTEGER REFERENCES usuario(id),
-        status TEXT NOT NULL DEFAULT 'Aberto',
+        status status_leilao NOT NULL DEFAULT 'Aberto',
         vencedor_id INTEGER REFERENCES usuario(id),
-        data_termino TIMESTAMP -- Data de término (calculada)
+        data_termino TIMESTAMP
       );
 
       CREATE TABLE lance (
@@ -75,7 +77,7 @@ export class CreateDatabaseTablesXXXXXXXXXXXXXX implements MigrationInterface {
         valor DECIMAL(10,2) NOT NULL,
         data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         status TEXT NOT NULL,
-        tipo TEXT -- Tipo da transação (opcional)
+        tipo TEXT
       );
 
       CREATE TABLE historico_transacao (
@@ -107,6 +109,7 @@ export class CreateDatabaseTablesXXXXXXXXXXXXXX implements MigrationInterface {
       DROP TABLE usuario_perfil;
       DROP TABLE usuario;
       DROP TABLE perfil;
+      DROP TYPE status_leilao;
     `);
   }
 }

@@ -6,12 +6,12 @@ export class Logs {
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
-    @ManyToOne(() => Usuario, { nullable: true }) // Uma ação pode não estar associada a um usuário
+    @ManyToOne(() => Usuario, { nullable: true }) 
     @JoinColumn({ name: 'usuario_id' })
     usuario?: Usuario;
 
-    @Column()
-    acao: string | undefined;
+    @Column({ type: 'text' }) // ou @Column({ type: 'varchar', length: 255 }) 
+    acao?: string; // Certifique-se de que acao é do tipo string
 
     @Column({ nullable: true })
     descricao?: string;

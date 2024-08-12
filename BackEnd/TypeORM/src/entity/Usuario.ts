@@ -6,27 +6,27 @@ import { UsuarioPerfil } from './UsuarioPerfil';
 @Entity()
 export class Usuario {
     @PrimaryGeneratedColumn()
-    id: number | undefined;
+    id: number | undefined; // id pode ser undefined antes de ser salvo no banco
 
-    @Column()
-    nomeCompleto: string | undefined;
+    @Column({ type: 'text'})
+    nome_completo?: string; 
 
-    @Column({ unique: true })
-    email: string | undefined;
+    @Column({ type: 'text'}) 
+    email?: string; 
 
-    @Column({ nullable: true })
-    telefoneCelular?: string;
+    @Column({ type: 'text' ,nullable: true}) 
+    telefone_celular?: string;
 
-    @Column({ unique: true })
-    cpf: string | undefined;
+    @Column({ type: 'text'})
+    cpf?: string;
 
-    @Column()
-    senha: string | undefined; // Certifique-se de armazenar hashes de senha!
+    @Column({ type: 'text'})
+    senha?: string;
 
-    @Column({ nullable: true })
-    enderecoCarteira?: string;
+    @Column({ type: 'text', nullable: true }) 
+    endereco_carteira?: string;
 
-    @Column({ nullable: true })
+    @Column({ type: 'text', nullable: true })
     foto?: string;
 
     @OneToMany(() => Leilao, leilao => leilao.criador)
@@ -37,4 +37,5 @@ export class Usuario {
 
     @OneToMany(() => UsuarioPerfil, usuarioPerfil => usuarioPerfil.usuario)
     perfis: UsuarioPerfil[] | undefined;
+  telefone: any;
 }

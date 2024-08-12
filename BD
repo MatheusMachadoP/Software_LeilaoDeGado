@@ -78,15 +78,6 @@ CREATE TABLE transacao (
   status TEXT NOT NULL -- Ex: "Pendente", "Confirmada", "Falhou"
 );
 
--- Tabela de Notificações
-CREATE TABLE notificacao (
-  id SERIAL PRIMARY KEY,
-  usuario_id INTEGER REFERENCES usuario(id),
-  leilao_id INTEGER REFERENCES leilao(id),
-  tipo TEXT NOT NULL,
-  mensagem TEXT NOT NULL,
-  data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-);
 
 -- Tabela de Histórico de Transações (Atualizada)
 CREATE TABLE historico_transacao (

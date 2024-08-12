@@ -11,8 +11,8 @@ export class Transacao {
     @JoinColumn({ name: 'lance_id' })
     lance?: Lance;
 
-    @Column()
-    enderecoCarteira: string | undefined;
+    @Column({ type: 'text' }) 
+    enderecoCarteira?: string; 
 
     @Column('decimal', { precision: 10, scale: 2 })
     valor: number | undefined;
@@ -20,8 +20,8 @@ export class Transacao {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dataHora: Date | undefined;
 
-    @Column()
-    status: string | undefined; // 'Pendente', 'Confirmada', 'Falhou', etc.
+    @Column({ type: 'text' })
+    status?: string; // 'Pendente', 'Confirmada', 'Falhou', etc.
 
     @Column({ nullable: true }) // Opcional: Tipo da transação
     tipo?: string; 

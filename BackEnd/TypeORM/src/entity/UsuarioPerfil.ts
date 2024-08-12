@@ -14,5 +14,5 @@ export class UsuarioPerfil {
 
     @ManyToOne(() => Perfil, (perfil: { usuarios: any; }) => perfil.usuarios)
     @JoinColumn({ name: 'perfil_id' })
-    perfil: Perfil;
+    perfil: Perfil | undefined;
 }

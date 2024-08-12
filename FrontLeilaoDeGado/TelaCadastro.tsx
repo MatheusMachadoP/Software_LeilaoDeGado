@@ -59,8 +59,8 @@ const TelaCadastro: React.FC = () => {
     try {
       const response = await api.post('/usuarios', {
         nome_completo: nomeCompleto,
-        email: email,
-        telefone: telefone,
+        email: email.toLowerCase,
+        telefone_celular: telefone,
         cpf: cpf,
         senha: senha,
         remember_me: rememberMe,

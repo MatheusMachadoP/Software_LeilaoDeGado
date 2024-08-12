@@ -13,7 +13,7 @@ export class Lance {
     @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
     dataHora: Date | undefined;
 
-    @ManyToOne(() => Leilao, (leilao: any) => leilao.lances) // forwardRef para evitar circular dependency
+    @ManyToOne(() => Leilao, (leilao: any) => leilao.lances)
     @JoinColumn({ name: 'leilao_id' })
     leilao: Leilao | undefined;
 
