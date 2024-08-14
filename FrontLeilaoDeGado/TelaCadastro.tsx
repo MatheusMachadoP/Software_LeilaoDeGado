@@ -59,12 +59,12 @@ const TelaCadastro: React.FC = () => {
     try {
       const response = await api.post('/usuarios', {
         nome_completo: nomeCompleto,
-        email: email.toLowerCase,
+        email: email.toLowerCase(),
         telefone_celular: telefone,
         cpf: cpf,
         senha: senha,
         remember_me: rememberMe,
-      });
+    });
       console.log('Usuário criado:', response.data);
       Alert.alert('Sucesso', 'Usuário criado com sucesso!');
       navigation.navigate('Login');

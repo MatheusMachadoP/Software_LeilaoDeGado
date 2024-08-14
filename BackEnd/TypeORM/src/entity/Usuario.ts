@@ -9,25 +9,25 @@ export class Usuario {
     id: number | undefined; // id pode ser undefined antes de ser salvo no banco
 
     @Column({ type: 'text'})
-    nome_completo?: string; 
+    nome_completo!: string; 
 
-    @Column({ type: 'text'}) 
-    email?: string; 
+    @Column({ type: 'text' })
+   email!: string; 
 
     @Column({ type: 'text' ,nullable: true}) 
-    telefone_celular?: string;
+    telefone_celular!: string;
 
     @Column({ type: 'text'})
-    cpf?: string;
+    cpf!: string;
 
     @Column({ type: 'text'})
-    senha?: string;
+    senha!: string;
 
     @Column({ type: 'text', nullable: true }) 
-    endereco_carteira?: string;
+    endereco_carteira!: string;
 
     @Column({ type: 'text', nullable: true })
-    foto?: string;
+    foto!: string;
 
     @OneToMany(() => Leilao, leilao => leilao.criador)
     leiloesCriados: Leilao[] | undefined;
