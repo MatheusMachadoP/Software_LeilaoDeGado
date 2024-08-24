@@ -23,16 +23,25 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
-
+  
     try {
+      // Logando a URL base para verificar se está correta
+      console.log('URL Base:', api.defaults.baseURL);
+
       const response = await api.post('/login', {
         email: email,
         senha: senha,
       });
-      console.log('Usuário logado:', response.data);
+
+      // Logando a resposta da API
+      console.log('Resposta da API:', response.data);
+
       Alert.alert('Sucesso', 'Login realizado com sucesso!');
       navigation.navigate('BoasVindas');
-    } catch (error: any) { // Aqui especificamos o tipo 'any' para o erro
+    } catch (error: any) {
+      console.error('Erro ao fazer login:', error);
+
+      // Tratamento específico dos erros
       if (error.response) {
         if (error.response.status === 404) {
           Alert.alert('Erro', 'Usuário não encontrado');
@@ -44,10 +53,9 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
       } else {
         Alert.alert('Erro', 'Erro de conexão com o servidor');
       }
-      console.error('Erro ao fazer login:', error);
     }
   };
-
+  
   return (
     <View style={styles.container}>
       <Image source={require('./assets/logo.png')} style={styles.mainLogo} />

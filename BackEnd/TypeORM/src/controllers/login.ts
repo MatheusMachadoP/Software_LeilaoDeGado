@@ -7,28 +7,38 @@ const router = express.Router();
 
 router.post('/', async (req, res) => {
   const { email, senha } = req.body;
+  
+  // Logando a tentativa de login para verificação
+  console.log('Tentativa de login com email:', email);
 
   try {
     const usuarioRepository = AppDataSource.getRepository(Usuario);
 
-    // Garante que o email seja tratado em lowercase para evitar problemas de case-sensitivity
+    // Busca o usuário pelo email, tratando o email em lowercase
     const usuario = await usuarioRepository.findOne({
       where: { email: email.toLowerCase() },
-      relations: ['perfis', 'perfis.perfil'],  // Carrega os perfis relacionados para uso posterior
+      relations: ['perfis', 'perfis.perfil'],  // Certifique-se de que essas relações estão corretamente configuradas
     });
+
+    // Logando o resultado da busca
+    console.log('Usuário encontrado:', usuario);
 
     // Verifica se o usuário foi encontrado
     if (!usuario) {
+      console.log('Usuário não encontrado:', email);
       return res.status(404).json({ message: 'Usuário não encontrado' });
     }
 
-    // Verifica se a senha é válida
+    // Verifica se a senha é válida comparando com a senha criptografada no banco de dados
     const isValidPassword = await bcrypt.compare(senha, usuario.senha);
     if (!isValidPassword) {
+      console.log('Senha inválida para o usuário:', email);
       return res.status(401).json({ message: 'Senha inválida' });
     }
 
-    // Prepara uma lista de perfis para incluir na resposta
+    console.log('Login realizado com sucesso para o usuário:', email);
+
+    // Prepara uma lista de perfis para incluir na resposta, se existirem
     const perfis = usuario.perfis && usuario.perfis.length > 0
       ? usuario.perfis.map(up => up.perfil?.nome || 'Perfil Desconhecido')
       : [];

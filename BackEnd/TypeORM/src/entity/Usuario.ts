@@ -1,20 +1,20 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Leilao } from './Leilao';
-import { Lance } from './Lance';
-import { UsuarioPerfil } from './UsuarioPerfil';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Leilao } from "./Leilao";
+import { Lance } from "./Lance";
+import { UsuarioPerfil } from "./UsuarioPerfil";
 
 @Entity()
 export class Usuario {
     @PrimaryGeneratedColumn()
-    id: number | undefined; // id pode ser undefined antes de ser salvo no banco
+    id: number | undefined;
 
     @Column({ type: 'text'})
-    nome_completo!: string; 
+    nome_completo!: string;
 
     @Column({ type: 'text' })
-   email!: string; 
+    email!: string;
 
-    @Column({ type: 'text' ,nullable: true}) 
+    @Column({ type: 'text', nullable: true})
     telefone_celular!: string;
 
     @Column({ type: 'text'})
@@ -23,7 +23,7 @@ export class Usuario {
     @Column({ type: 'text'})
     senha!: string;
 
-    @Column({ type: 'text', nullable: true }) 
+    @Column({ type: 'text', nullable: true })
     endereco_carteira!: string;
 
     @Column({ type: 'text', nullable: true })
@@ -37,5 +37,4 @@ export class Usuario {
 
     @OneToMany(() => UsuarioPerfil, usuarioPerfil => usuarioPerfil.usuario)
     perfis: UsuarioPerfil[] | undefined;
-  telefone: any;
 }
