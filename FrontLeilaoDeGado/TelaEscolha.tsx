@@ -16,7 +16,7 @@ const TelaEscolha: React.FC<Props> = ({ navigation }) => {
       <Text style={styles.welcomeText}>Bem vindo!</Text>
       <Text style={styles.title}>Faça sua Escolha</Text>
       <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('Leiloeiro')}>
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('CriarLeilao')}>
           <Image source={require('./assets/leiloeiro.png')} style={styles.icon} />
           <Text style={styles.optionText}>Leiloeiro</Text>
         </TouchableOpacity>

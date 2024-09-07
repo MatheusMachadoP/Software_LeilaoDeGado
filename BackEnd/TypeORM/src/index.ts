@@ -8,6 +8,7 @@ import { Usuario } from './entity/Usuario';
 import loginRouter from './controllers/login';
 import usuarioRouter from './controllers/usuario';
 import { errorHandler } from './middlewares/errorHandler';
+import leilaoRouter from './controllers/leilao';
 
 // Carregar as variáveis de ambiente do arquivo .env
 dotenv.config();
@@ -15,6 +16,7 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use('/leiloes', leilaoRouter);
 
 AppDataSource.initialize().then(async () => {
     console.log("Data Source has been initialized!");

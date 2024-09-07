@@ -10,6 +10,8 @@ import TelaCarteira from './TelaCarteira';
 import TelaEscolha from './TelaEscolha';
 import TelaLeiloeiro from './TelaLeiloeiro';
 import TelaLicitante from './TelaLicitante';
+import TelaCriarLeilao from './TelaCriarLeilao';
+import TelaGerenciarLeilao from './TelaGerenciarLeilao';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -21,6 +23,8 @@ export type RootStackParamList = {
   Escolha: undefined;
   Leiloeiro: undefined;
   Licitante: undefined;
+  CriarLeilao: undefined;
+  GerenciarLeilao: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -77,6 +81,14 @@ const App: React.FC = () => {
         <Stack.Screen
           name="Licitante"
           component={TelaLicitante}
+        />
+        <Stack.Screen
+          name="CriarLeilao"
+          component={TelaCriarLeilao}
+        />
+        <Stack.Screen
+          name="GerenciarLeilao"
+          component={TelaGerenciarLeilao}
         />
       </Stack.Navigator>
     </NavigationContainer>
