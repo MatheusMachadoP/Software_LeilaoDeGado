@@ -2,7 +2,6 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import TelaInicial1 from './TelaInicial1';
-import TelaInicial2 from './TelaInicial2';
 import TelaLogin from './TelaLogin';
 import TelaCadastro from './TelaCadastro';
 import TelaBoasVindas from './TelaBoasVindas'; 
@@ -12,10 +11,10 @@ import TelaLeiloeiro from './TelaLeiloeiro';
 import TelaLicitante from './TelaLicitante';
 import TelaCriarLeilao from './TelaCriarLeilao';
 import TelaGerenciarLeilao from './TelaGerenciarLeilao';
+import TelaMeusLeiloes from './TelaMeusLeiloes';
 
 export type RootStackParamList = {
   Home: undefined;
-  TelaInicial: undefined;
   Login: undefined;
   Cadastro: undefined;
   BoasVindas: undefined;
@@ -24,7 +23,8 @@ export type RootStackParamList = {
   Leiloeiro: undefined;
   Licitante: undefined;
   CriarLeilao: undefined;
-  GerenciarLeilao: undefined;
+  GerenciarLeilao: { leilaoId?: string };
+  MeusLeiloes: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -49,10 +49,6 @@ const App: React.FC = () => {
           name="Home"
           component={TelaInicial1}
           options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="TelaInicial"
-          component={TelaInicial2}
         />
         <Stack.Screen
           name="Login"
@@ -89,6 +85,10 @@ const App: React.FC = () => {
         <Stack.Screen
           name="GerenciarLeilao"
           component={TelaGerenciarLeilao}
+        />
+        <Stack.Screen
+          name="MeusLeiloes"
+          component={TelaMeusLeiloes}
         />
       </Stack.Navigator>
     </NavigationContainer>

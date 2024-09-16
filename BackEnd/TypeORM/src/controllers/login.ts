@@ -1,5 +1,6 @@
 import express from 'express';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../data-source';
 import { Usuario } from '../entity/Usuario';
 
@@ -38,13 +39,20 @@ router.post('/', async (req, res) => {
 
     console.log('Login realizado com sucesso para o usuário:', email);
 
+    // Geração do token JWT
+    const token = jwt.sign(
+      { id: usuario.id }, 
+      process.env.JWT_SECRET as string, 
+      { expiresIn: '1h' } // Define o tempo de expiração do token conforme sua necessidade
+    );
+
     // Prepara uma lista de perfis para incluir na resposta, se existirem
     const perfis = usuario.perfis && usuario.perfis.length > 0
       ? usuario.perfis.map(up => up.perfil?.nome || 'Perfil Desconhecido')
       : [];
 
-    // Retorna sucesso com os perfis do usuário
-    res.json({ message: 'Login realizado com sucesso', perfis });
+    // Retorna sucesso com os perfis do usuário e o token JWT
+    res.json({ message: 'Login realizado com sucesso', token, perfis });
   } catch (error) {
     console.error('Erro no login:', error);
     res.status(500).json({ message: 'Erro no servidor' });

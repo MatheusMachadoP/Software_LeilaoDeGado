@@ -1,14 +1,29 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from './App';
 
 const TelaGerenciarLeilao: React.FC = () => {
-  // Aqui você pode buscar e listar os leilões criados pelo leiloeiro
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>(); // Usando o hook useNavigation
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Meus Leilões</Text>
-      {/* Listar os leilões aqui */}
-      <Button title="Editar Leilão" onPress={() => { /* Ação de editar */ }} />
-      <Button title="Excluir Leilão" onPress={() => { /* Ação de excluir */ }} />
+      <Text style={styles.title}>Gerenciar Leilões</Text>
+      <View style={styles.menu}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('CriarLeilao')}>
+          <Text style={styles.menuButtonText}>Criar Leilão</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('MeusLeiloes')}>
+          <Text style={styles.menuButtonText}>Meus Leilões</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuButton} onPress={() => { /* Ação de editar leilão */ }}>
+          <Text style={styles.menuButtonText}>Editar Leilão</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.menuButton} onPress={() => { /* Ação de excluir leilão */ }}>
+          <Text style={styles.menuButtonText}>Excluir Leilão</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -17,12 +32,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#000',
+    backgroundColor: '#1a1a1a',
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     color: '#fff',
-    marginBottom: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 20,
+  },
+  menu: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  menuButton: {
+    backgroundColor: '#333',
+    padding: 15,
+    borderRadius: 8,
+    marginVertical: 10,
+    alignItems: 'center',
+  },
+  menuButtonText: {
+    fontSize: 18,
+    color: '#fff',
   },
 });
 

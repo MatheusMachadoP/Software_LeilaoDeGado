@@ -7,12 +7,12 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import api from './api/api';
 import { RootStackParamList } from './App';
 import { format } from 'date-fns';
+import AsyncStorage from '@react-native-async-storage/async-storage';  // Importar o AsyncStorage
 
 type CriarLeilaoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CriarLeilao'>;
 
-const formatDate = (dateString: string) => {
-    const [day, month, year] = dateString.split('/');
-    return new Date(`${year}-${month}-${day}T00:00:00Z`).toISOString();
+const formatDate = (date: Date) => {
+  return date.toISOString();
 };
 
 const TelaCriarLeilao: React.FC = () => {
@@ -87,56 +87,55 @@ const TelaCriarLeilao: React.FC = () => {
     }
   };
 
-  // Função para formatar a data em formato ISO 8601
-const formatDate = (date: Date) => {
-  return date.toISOString();
-};
-
-const handleCriarLeilao = async () => {
-  if (!validateFields()) {
-    return;
-  }
-
-  try {
-    const formData = new FormData();
-    formData.append('nome_ativo', nomeAtivo);
-    formData.append('raca', raca);
-
-    // Verifica se a data foi selecionada e converte para ISO 8601
-    const formattedDataInicio = dataInicio ? formatDate(dataInicio) : '';
-    formData.append('data_inicio', formattedDataInicio);
-
-    formData.append('valor_inicial', valorInicial);
-    formData.append('duracao', duracao);
-    formData.append('descricao', descricao);
-
-    if (image) {
-      formData.append('foto', {
-        uri: image,
-        name: 'leilao.jpg',
-        type: 'image/jpeg',
-      } as any);
+  const handleCriarLeilao = async () => {
+    if (!validateFields()) {
+      return;
     }
 
-    console.log('FormData being sent:', formData);
+    try {
+      // Recupera o token do AsyncStorage, que foi armazenado durante o login
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Erro', 'Token não encontrado, faça login novamente.');
+        return;
+      }
 
-    const response = await api.post('/leiloes', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+      const formData = new FormData();
+      formData.append('nome_ativo', nomeAtivo);
+      formData.append('raca', raca);
+      const formattedDataInicio = dataInicio ? formatDate(dataInicio) : '';
+      formData.append('data_inicio', formattedDataInicio);
+      formData.append('valor_inicial', valorInicial);
+      formData.append('duracao', duracao);
+      formData.append('descricao', descricao);
 
-    console.log('Leilão criado:', response.data);
-    Alert.alert('Sucesso', 'Leilão criado com sucesso!');
-    navigation.navigate('GerenciarLeilao');
-  } catch (error) {
-    console.error('Erro ao criar leilão:', error);
-    Alert.alert('Erro', 'Não foi possível criar o leilão');
-  }
-};
+      if (image) {
+        formData.append('foto', {
+          uri: image,
+          name: 'leilao.jpg',
+          type: 'image/jpeg',
+        } as any);
+      }
 
-  
-  
+      console.log('FormData being sent:', formData);
+
+      // Envia a requisição com o token no cabeçalho
+      const response = await api.post('/leiloes', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'Authorization': `Bearer ${token}`, // Inclui o token corretamente
+        },
+      });
+
+      console.log('Leilão criado:', response.data);
+      Alert.alert('Sucesso', 'Leilão criado com sucesso!');
+      navigation.navigate('GerenciarLeilao', { leilaoId: response.data.leilao.id });
+    } catch (error) {
+      console.error('Erro ao criar leilão:', error);
+      Alert.alert('Erro', 'Não foi possível criar o leilão');
+    }
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>

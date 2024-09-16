@@ -26,7 +26,7 @@ const TelaInicial1: React.FC<Props> = ({ navigation }) => {
             <Text style={styles.normalText}>Agora!</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TelaInicial')}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
           <View style={styles.gradient}>
             <Text style={styles.buttonText}>Começar Agora</Text>
           </View>

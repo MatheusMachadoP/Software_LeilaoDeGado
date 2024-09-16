@@ -5,20 +5,26 @@ import { plainToClass } from 'class-transformer';
 
 export const validateUsuario = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    // Converte os dados da requisição em uma instância da classe Usuario
-    const usuario = plainToClass(Usuario, req.body);
+    console.log('Recebendo dados para validação:', req.body);
 
-    // Realiza a validação dos dados com base nos decorators da classe Usuario
+    const usuario = plainToClass(Usuario, req.body);
+    console.log('Validando a instância:', usuario);
+
     const errors = await validate(usuario);
 
     if (errors.length > 0) {
-      // Se houver erros, envia uma resposta com os erros
-      return res.status(400).json({ errors });
+      console.log('Erros de validação:', errors);
+      return res.status(400).json({
+        message: 'Erro de validação nos dados fornecidos.',
+        details: errors,
+      });
     }
 
-    // Se não houver erros, passa para o próximo middleware ou rota
     next();
   } catch (error) {
-    next(error); // Passa o erro para o middleware de tratamento de erros
+    console.error('Erro no middleware de validação:', error);
+    next(error);
   }
 };
+
+

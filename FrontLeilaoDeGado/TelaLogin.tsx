@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Certifique-se de instalar e importar o AsyncStorage
 import { RootStackParamList } from './App';
 import api from './api/api';
 
@@ -25,7 +26,6 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
     }
   
     try {
-      // Logando a URL base para verificar se está correta
       console.log('URL Base:', api.defaults.baseURL);
 
       const response = await api.post('/login', {
@@ -33,15 +33,17 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
         senha: senha,
       });
 
-      // Logando a resposta da API
       console.log('Resposta da API:', response.data);
+
+      // Armazene o token JWT usando AsyncStorage
+      const { token } = response.data;
+      await AsyncStorage.setItem('authToken', token);
 
       Alert.alert('Sucesso', 'Login realizado com sucesso!');
       navigation.navigate('BoasVindas');
     } catch (error: any) {
       console.error('Erro ao fazer login:', error);
 
-      // Tratamento específico dos erros
       if (error.response) {
         if (error.response.status === 404) {
           Alert.alert('Erro', 'Usuário não encontrado');
