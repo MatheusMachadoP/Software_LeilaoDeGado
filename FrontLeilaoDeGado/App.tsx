@@ -6,25 +6,26 @@ import TelaLogin from './TelaLogin';
 import TelaCadastro from './TelaCadastro';
 import TelaBoasVindas from './TelaBoasVindas'; 
 import TelaCarteira from './TelaCarteira';
-import TelaEscolha from './TelaEscolha';
 import TelaLeiloeiro from './TelaLeiloeiro';
 import TelaLicitante from './TelaLicitante';
 import TelaCriarLeilao from './TelaCriarLeilao';
 import TelaGerenciarLeilao from './TelaGerenciarLeilao';
 import TelaMeusLeiloes from './TelaMeusLeiloes';
+import TelaDetalhesLeilao from './TelaDetalhesLeilao';
 
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Cadastro: undefined;
   BoasVindas: undefined;
-  Carteira: { address: string }; 
+  Carteira: { address: string; userType: 'Licitante' | 'Leiloeiro' };
   Escolha: undefined;
   Leiloeiro: undefined;
   Licitante: undefined;
   CriarLeilao: undefined;
-  GerenciarLeilao: { leilaoId?: string };
+  GerenciarLeilao: undefined;
   MeusLeiloes: undefined;
+  DetalhesLeilao: { leilaoId: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -67,10 +68,6 @@ const App: React.FC = () => {
           component={TelaCarteira} 
         />
         <Stack.Screen
-          name="Escolha"
-          component={TelaEscolha} 
-        />
-        <Stack.Screen
           name="Leiloeiro"
           component={TelaLeiloeiro}
         />
@@ -89,6 +86,10 @@ const App: React.FC = () => {
         <Stack.Screen
           name="MeusLeiloes"
           component={TelaMeusLeiloes}
+        />
+        <Stack.Screen
+          name="DetalhesLeilao"
+          component={TelaDetalhesLeilao}
         />
       </Stack.Navigator>
     </NavigationContainer>

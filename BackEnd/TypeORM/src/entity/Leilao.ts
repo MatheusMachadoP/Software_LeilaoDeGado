@@ -1,33 +1,36 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, BeforeInsert, BeforeUpdate, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany, JoinColumn, BeforeInsert, BeforeUpdate } from 'typeorm';
 import { Usuario } from './Usuario';
 import { Lance } from './Lance';
-import { add } from 'date-fns';
+import { addHours, addMinutes } from 'date-fns';
 
 export enum StatusLeilao {
   ABERTO = 'Aberto',
-  EM_ANDAMENTO = 'Em Andamento',
-  FINALIZADO = 'Finalizado'
+  FECHADO = 'Fechado',
+  CANCELADO = 'Cancelado',
 }
 
 @Entity()
 export class Leilao {
   @PrimaryGeneratedColumn()
-  id: number | undefined;
+  id!: number;
 
-  @Column({ type: 'text' })
-  nomeAtivo: string | undefined; 
+  @Column({ type: 'text', name: 'nome_ativo' })
+  nomeAtivo!: string;
 
   @Column({ nullable: true })
   raca?: string;
 
-  @Column({ type: 'timestamp' })
-  dataInicio: Date | undefined; 
+  @Column({ type: 'timestamp', name: 'data_inicio' }) // renomeado para consistência com o banco
+  dataInicio!: Date;
 
-  @Column('decimal', { precision: 10, scale: 2 })
-  valorInicial: number | undefined; 
+  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'valor_inicial' }) // Nome no banco de dados ajustado
+  valorInicial!: number;
 
-  @Column('interval')
-  duracao: string | undefined;
+  @Column({ type: 'int', nullable: true, name: 'horas_duracao' })
+  horasDuracao?: number;
+
+  @Column({ type: 'int', nullable: true, name: 'minutos_duracao' })
+  minutosDuracao?: number;
 
   @Column({ nullable: true })
   descricao?: string;
@@ -35,33 +38,43 @@ export class Leilao {
   @Column({ nullable: true })
   foto?: string;
 
-  @ManyToOne(() => Usuario, usuario => usuario.leiloesCriados)
+  // Relacionamento com o criador (leiloeiro)
+  @ManyToOne(() => Usuario, (usuario) => usuario.leiloesCriados, { eager: true })
   @JoinColumn({ name: 'criador_id' })
-  criador: Usuario | undefined; 
+  criador!: Usuario;
 
   @Column({
     type: 'enum',
     enum: StatusLeilao,
     default: StatusLeilao.ABERTO,
   })
-  status: StatusLeilao | undefined;
+  status!: StatusLeilao;
 
   @ManyToOne(() => Usuario, { nullable: true })
   @JoinColumn({ name: 'vencedor_id' })
   vencedor?: Usuario;
 
-  @OneToMany(() => Lance, (lance: any) => lance.leilao) 
-  lances: Lance[] | undefined; 
+  @OneToMany(() => Lance, (lance) => lance.leilao)
+  lances!: Lance[];
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ type: 'timestamp', nullable: true, name: 'data_termino' }) // Nome no banco de dados ajustado
   dataTermino?: Date;
 
+  // Calcula a data de término antes de inserir ou atualizar o leilão
   @BeforeInsert()
   @BeforeUpdate()
   calcularDataTermino() {
-    if (this.dataInicio && this.duracao) {
-      const [amount, unit] = this.duracao.split(' ');
-      this.dataTermino = add(this.dataInicio, { [unit]: parseInt(amount) });
+    if (this.dataInicio) {
+      let dataTermino = new Date(this.dataInicio);
+
+      if (this.horasDuracao) {
+        dataTermino = addHours(dataTermino, this.horasDuracao);
+      }
+      if (this.minutosDuracao) {
+        dataTermino = addMinutes(dataTermino, this.minutosDuracao);
+      }
+
+      this.dataTermino = dataTermino;
     }
   }
 }

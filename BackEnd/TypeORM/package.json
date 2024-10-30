@@ -1,39 +1,45 @@
 {
-   "name": "leilao-de-gado",
-   "version": "1.0.0",
-   "description": "Projeto de CRUD para leilão de gado usando Node.js, TypeORM, Express e PostgreSQL",
-   "main": "src/index.ts",
-   "scripts": {
-      "start": "ts-node src/index.ts",
-      "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
-   },
-   "dependencies": {
-      "bcryptjs": "^2.4.3",
-      "class-transformer": "^0.5.1",
-      "class-validator": "^0.14.1",
-      "cors": "^2.8.5",
-      "date-fns": "^3.6.0",
-      "dotenv": "^10.0.0",
-      "express": "^4.20.0",
-      "jsonwebtoken": "^9.0.2",
-      "leilao-de-gado": "file:",
-      "multer": "^1.4.5-lts.1",
-      "pg": "^8.7.1",
-      "pino": "^9.3.2",
-      "reflect-metadata": "^0.1.13",
-      "typeorm": "^0.3.20"
-   },
-   "devDependencies": {
-      "@types/bcryptjs": "^2.4.6",
-      "@types/cors": "^2.8.10",
-      "@types/express": "^4.17.13",
-      "@types/jsonwebtoken": "^9.0.6",
-      "@types/multer": "^1.4.12",
-      "@types/node": "^16.11.7",
-      "ts-node": "^10.4.0",
-      "ts-node-dev": "^1.1.8",
-      "typescript": "^4.4.4"
-   },
-   "author": "Matheus",
-   "license": "MIT"
+  "name": "leilao-de-gado",
+  "version": "1.0.0",
+  "description": "Projeto de CRUD para leilão de gado usando Node.js, TypeORM, Express e PostgreSQL",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts"
+  },
+  "dependencies": {
+    "axios": "^1.7.7",
+    "bcryptjs": "^2.4.3",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
+    "cors": "^2.8.5",
+    "date-fns": "^3.6.0",
+    "dotenv": "^10.0.0",
+    "expo": "^51.0.0",
+    "express": "^4.20.0",
+    "jsonwebtoken": "^9.0.2",
+    "leilao-de-gado": "file:",
+    "multer": "^1.4.5-lts.1",
+    "pg": "^8.7.1",
+    "pino": "^9.3.2",
+    "react": "18.2.0",
+    "react-native": "0.74.5",
+    "reflect-metadata": "^0.1.14",
+    "typeorm": "^0.3.20"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.10",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/multer": "^1.4.12",
+    "@types/node": "^16.11.7",
+    "@types/react": "~18.2.79",
+    "@types/react-dom": "^18.3.1",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^1.1.8",
+    "typescript": "~5.3.3"
+  },
+  "author": "Matheus",
+  "license": "MIT"
 }

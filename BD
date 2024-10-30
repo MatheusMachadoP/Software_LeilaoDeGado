@@ -1,12 +1,3 @@
--- Tabela de Perfis
-CREATE TABLE perfil (
-  id SERIAL PRIMARY KEY,
-  nome TEXT UNIQUE NOT NULL
-);
-
--- Inserção dos perfis
-INSERT INTO perfil (nome) VALUES ('Licitante'), ('Leiloeiro');
-
 -- Tabela de Usuários
 CREATE TABLE usuario (
   id SERIAL PRIMARY KEY,
@@ -16,18 +7,11 @@ CREATE TABLE usuario (
   cpf TEXT UNIQUE NOT NULL,
   senha TEXT NOT NULL,
   endereco_carteira TEXT,
-  foto TEXT
+  foto TEXT,
+  tipo_usuario TEXT NOT NULL CHECK (tipo_usuario IN ('Leiloeiro', 'Licitante')) -- Definir o tipo do usuário
 );
 
--- Tabela de Perfis de Usuário
-CREATE TABLE usuario_perfil (
-  id SERIAL PRIMARY KEY,
-  usuario_id INTEGER REFERENCES usuario(id) ON DELETE CASCADE,
-  perfil_id INTEGER REFERENCES perfil(id) ON DELETE CASCADE,
-  UNIQUE (usuario_id, perfil_id)
-);
-
--- Tabela de Leilões
+-- Tabela de Leilões (apenas leiloeiros podem criar leilões)
 CREATE TABLE leilao (
   id SERIAL PRIMARY KEY,
   nome_ativo TEXT NOT NULL,
@@ -37,35 +21,21 @@ CREATE TABLE leilao (
   duracao INTERVAL NOT NULL,
   descricao TEXT,
   foto TEXT,
-  criador_id INTEGER REFERENCES usuario(id) ON DELETE SET NULL,
+  leiloeiro_id INTEGER REFERENCES usuario(id) ON DELETE SET NULL,  -- Referência ao leiloeiro que criou o leilão
   status TEXT NOT NULL DEFAULT 'Aberto',
-  vencedor_id INTEGER REFERENCES usuario(id) ON DELETE SET NULL,
+  vencedor_id INTEGER REFERENCES usuario(id) ON DELETE SET NULL,  -- Referência ao licitante vencedor
   data_termino TIMESTAMP
 );
 
--- Tabela de Lances
+-- Tabela de Lances (apenas licitantes podem dar lances)
 CREATE TABLE lance (
   id SERIAL PRIMARY KEY,
   valor DECIMAL(10,2) NOT NULL,
   data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   leilao_id INTEGER REFERENCES leilao(id) ON DELETE CASCADE,
-  usuario_id INTEGER REFERENCES usuario(id) ON DELETE CASCADE,
-  UNIQUE (leilao_id, usuario_id)
+  licitante_id INTEGER REFERENCES usuario(id) ON DELETE CASCADE,  -- Referência ao licitante que deu o lance
+  UNIQUE (leilao_id, licitante_id)
 );
-
--- Função e Trigger para validar lance
-CREATE OR REPLACE FUNCTION valida_lance() RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.usuario_id = (SELECT criador_id FROM leilao WHERE id = NEW.leilao_id) THEN
-    RAISE EXCEPTION 'O criador do leilão não pode fazer lances no próprio leilão';
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER valida_lance_trigger
-BEFORE INSERT ON lance
-FOR EACH ROW EXECUTE FUNCTION valida_lance();
 
 -- Tabela de Transações
 CREATE TABLE transacao (
@@ -87,7 +57,7 @@ CREATE TABLE historico_transacao (
   data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Tabela de Logs
+-- Tabela de Logs (para registrar as ações dos usuários)
 CREATE TABLE logs (
   id SERIAL PRIMARY KEY,
   usuario_id INTEGER REFERENCES usuario(id) ON DELETE SET NULL,
@@ -95,3 +65,21 @@ CREATE TABLE logs (
   descricao TEXT,
   data_hora TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Inserindo alguns dados para teste
+INSERT INTO usuario (nome_completo, email, telefone_celular, cpf, senha, tipo_usuario) VALUES 
+('João Leiloeiro', 'joao_leiloeiro@example.com', '11111111111', '12345678901', 'senha123', 'Leiloeiro'),
+('Maria Licitante', 'maria_licitante@example.com', '22222222222', '10987654321', 'senha123', 'Licitante');
+
+-- Testando a criação de um leilão por um leiloeiro
+INSERT INTO leilao (nome_ativo, raca, data_inicio, valor_inicial, duracao, descricao, leiloeiro_id) VALUES 
+('Leilão de Gado', 'Nelore', '2024-12-01 10:00:00', 5000.00, '2 days', 'Leilão de gado Nelore puro', 1);
+
+-- Testando a inserção de um lance por um licitante
+INSERT INTO lance (valor, leilao_id, licitante_id) VALUES 
+(5500.00, 1, 2);
+
+
+UPDATE leilao SET "nome_ativo" = 'Ativo Desconhecido' WHERE "nome_ativo" IS NULL;
+
+UPDATE leilao SET "data_inicio" = NOW() WHERE "data_inicio" IS NULL;

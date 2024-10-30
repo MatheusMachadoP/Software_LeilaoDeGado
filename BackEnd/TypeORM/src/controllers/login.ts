@@ -1,62 +1,53 @@
-import express from 'express';
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import express, { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { Usuario } from '../entity/Usuario';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
-router.post('/', async (req, res) => {
-  const { email, senha } = req.body;
-  
-  // Logando a tentativa de login para verificação
-  console.log('Tentativa de login com email:', email);
-
+const loginHandler = async (req: Request, res: Response): Promise<void> => {
   try {
+    const { email, senha } = req.body;
+    console.log('Tentativa de login com email:', email);
+
+    // Repositório de usuários
     const usuarioRepository = AppDataSource.getRepository(Usuario);
+    const usuario = await usuarioRepository.findOne({ where: { email: email.toLowerCase() } });
 
-    // Busca o usuário pelo email, tratando o email em lowercase
-    const usuario = await usuarioRepository.findOne({
-      where: { email: email.toLowerCase() },
-      relations: ['perfis', 'perfis.perfil'],  // Certifique-se de que essas relações estão corretamente configuradas
-    });
-
-    // Logando o resultado da busca
-    console.log('Usuário encontrado:', usuario);
-
-    // Verifica se o usuário foi encontrado
     if (!usuario) {
       console.log('Usuário não encontrado:', email);
-      return res.status(404).json({ message: 'Usuário não encontrado' });
+      res.status(404).json({ message: 'Usuário não encontrado' });
+      return;
     }
 
-    // Verifica se a senha é válida comparando com a senha criptografada no banco de dados
-    const isValidPassword = await bcrypt.compare(senha, usuario.senha);
-    if (!isValidPassword) {
-      console.log('Senha inválida para o usuário:', email);
-      return res.status(401).json({ message: 'Senha inválida' });
+    // Comparar senhas
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+    if (!senhaValida) {
+      console.log('Senha incorreta para o usuário:', email);
+      res.status(401).json({ message: 'Senha incorreta' });
+      return;
     }
-
-    console.log('Login realizado com sucesso para o usuário:', email);
 
     // Geração do token JWT
     const token = jwt.sign(
-      { id: usuario.id }, 
-      process.env.JWT_SECRET as string, 
-      { expiresIn: '1h' } // Define o tempo de expiração do token conforme sua necessidade
+      { id: usuario.id, tipo_usuario: usuario.tipo_usuario },
+      process.env.JWT_SECRET as string,
+      { expiresIn: '1h' }
     );
 
-    // Prepara uma lista de perfis para incluir na resposta, se existirem
-    const perfis = usuario.perfis && usuario.perfis.length > 0
-      ? usuario.perfis.map(up => up.perfil?.nome || 'Perfil Desconhecido')
-      : [];
-
-    // Retorna sucesso com os perfis do usuário e o token JWT
-    res.json({ message: 'Login realizado com sucesso', token, perfis });
+    res.status(200).json({
+      message: 'Login foi um sucesso',
+      token,
+      tipo_usuario: usuario.tipo_usuario,
+    });
   } catch (error) {
-    console.error('Erro no login:', error);
-    res.status(500).json({ message: 'Erro no servidor' });
+    console.error('Erro ao processar login:', error);
+    res.status(500).send('Erro Interno do Servidor');
   }
-});
+};
 
-export default router;
+// Definir a rota de login
+router.post('/', loginHandler);
+
+export { router as loginRouter };

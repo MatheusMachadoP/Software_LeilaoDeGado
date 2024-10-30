@@ -33,7 +33,7 @@ const TelaBoasVindas: React.FC<Props> = ({ navigation }) => {
   // Navegue para a tela 'Carteira' após a conexão
   useEffect(() => {
     if (isConnected && address) {
-      navigation.navigate('Carteira', { address });
+      navigation.navigate('Carteira', { address, userType: 'Licitante' }); // or 'Leiloeiro' based on your logic
     }
   }, [isConnected, address]);
 

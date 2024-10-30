@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 
 // Middleware de tratamento de erros
-export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction) => {
+export const errorHandler = (err: any, req: Request, res: Response, next: NextFunction): Response | void => {
     console.error('Erro capturado pelo middleware:', err);
 
     // Log dos dados da requisição que podem ter causado o erro

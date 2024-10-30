@@ -14,6 +14,7 @@ const TelaCadastro: React.FC = () => {
   const [cpf, setCpf] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [tipoUsuario, setTipoUsuario] = useState<'Leiloeiro' | 'Licitante'>(); // Novo estado para o tipo de usuário
   const [rememberMe, setRememberMe] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const navigation = useNavigation<CadastroScreenNavigationProp>();
@@ -46,6 +47,10 @@ const TelaCadastro: React.FC = () => {
       errors.confirmarSenha = 'As senhas não coincidem';
       valid = false;
     }
+    if (!tipoUsuario) {
+      errors.tipoUsuario = 'Escolha o tipo de usuário';
+      valid = false;
+    }
 
     setErrors(errors);
     return valid;
@@ -57,14 +62,15 @@ const TelaCadastro: React.FC = () => {
     }
 
     try {
-      const response = await api.post('/usuarios', {
+      const response = await api.post('/usuarios/create', {
         nome_completo: nomeCompleto,
         email: email.toLowerCase(),
-        telefone_celular: telefone,
+        telefone: telefone,
         cpf: cpf,
         senha: senha,
+        tipo_usuario: tipoUsuario, // Enviar o tipo de usuário
         remember_me: rememberMe,
-    });
+      });
       console.log('Usuário criado:', response.data);
       Alert.alert('Sucesso', 'Usuário criado com sucesso!');
       navigation.navigate('Login');
@@ -78,6 +84,8 @@ const TelaCadastro: React.FC = () => {
     <ScrollView contentContainerStyle={styles.scrollContainer}>
       <View style={styles.container}>
         <Image source={require('./assets/logo.png')} style={styles.logo} />
+        
+        {/* Input de Nome Completo */}
         <TextInput
           placeholder="Nome completo"
           placeholderTextColor="#888"
@@ -87,6 +95,7 @@ const TelaCadastro: React.FC = () => {
         />
         {errors.nomeCompleto && <Text style={styles.errorText}>{errors.nomeCompleto}</Text>}
 
+        {/* Input de Email */}
         <TextInput
           placeholder="Endereço de email"
           placeholderTextColor="#888"
@@ -97,6 +106,7 @@ const TelaCadastro: React.FC = () => {
         />
         {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
 
+        {/* Input de Telefone */}
         <TextInput
           placeholder="Telefone Celular"
           placeholderTextColor="#888"
@@ -107,6 +117,7 @@ const TelaCadastro: React.FC = () => {
         />
         {errors.telefone && <Text style={styles.errorText}>{errors.telefone}</Text>}
 
+        {/* Input de CPF */}
         <TextInput
           placeholder="CPF"
           placeholderTextColor="#888"
@@ -117,6 +128,7 @@ const TelaCadastro: React.FC = () => {
         />
         {errors.cpf && <Text style={styles.errorText}>{errors.cpf}</Text>}
 
+        {/* Input de Senha */}
         <TextInput
           placeholder="Senha"
           placeholderTextColor="#888"
@@ -127,6 +139,7 @@ const TelaCadastro: React.FC = () => {
         />
         {errors.senha && <Text style={styles.errorText}>{errors.senha}</Text>}
 
+        {/* Input de Confirmação de Senha */}
         <TextInput
           placeholder="Confirme sua senha"
           placeholderTextColor="#888"
@@ -137,17 +150,36 @@ const TelaCadastro: React.FC = () => {
         />
         {errors.confirmarSenha && <Text style={styles.errorText}>{errors.confirmarSenha}</Text>}
 
-        <TouchableOpacity style={styles.checkboxContainer} onPress={() => setRememberMe(!rememberMe)}>
-          <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-            {rememberMe && <Text style={styles.checkboxIcon}>✓</Text>}
-          </View>
-          <Text style={styles.checkboxLabel}>Lembrar-me</Text>
-        </TouchableOpacity>
+        {/* Seleção do Tipo de Usuário */}
+        <View style={styles.tipoContainer}>
+          <Text style={styles.label}>Deseja ser:  </Text>
+          <TouchableOpacity
+            style={[
+              styles.tipoButton,
+              tipoUsuario === 'Licitante' && styles.tipoButtonSelected,
+            ]}
+            onPress={() => setTipoUsuario('Licitante')}
+          >
+            <Text style={styles.tipoText}>Licitante</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[
+              styles.tipoButton,
+              tipoUsuario === 'Leiloeiro' && styles.tipoButtonSelected,
+            ]}
+            onPress={() => setTipoUsuario('Leiloeiro')}
+          >
+            <Text style={styles.tipoText}>Leiloeiro</Text>
+          </TouchableOpacity>
+        </View>
+        {errors.tipoUsuario && <Text style={styles.errorText}>{errors.tipoUsuario}</Text>}
 
+        {/* Botão de Registro */}
         <TouchableOpacity style={styles.button} onPress={handleRegister}>
           <Text style={styles.buttonText}>Continue</Text>
         </TouchableOpacity>
 
+        {/* Link para a tela de Login */}
         <View style={styles.loginContainer}>
           <Text style={styles.loginText}>Já tem uma conta?</Text>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
@@ -241,6 +273,34 @@ const styles = StyleSheet.create({
   loginLink: {
     color: '#BB86FC',
     textAlign: 'center',
+  },
+  tipoContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: 18,
+    width: '100%',
+  },
+  tipoButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    borderRadius: 9,
+    borderWidth: 1,
+    borderColor: '#888',
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 4,
+  },
+  tipoButtonSelected: {
+    backgroundColor: '#03DAC6',
+  },
+  tipoText: {
+    color: '#fff',
+  },
+  label: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
 });
 

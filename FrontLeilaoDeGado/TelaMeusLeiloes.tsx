@@ -7,14 +7,17 @@ import { AxiosError } from 'axios';
 import { RootStackParamList } from './App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Tipagem para navegação
 type MeusLeiloesScreenNavigationProp = StackNavigationProp<RootStackParamList, 'MeusLeiloes'>;
 
+// Definindo os campos do Leilão conforme esperado pelo backend
 interface Leilao {
   id: string;
-  nome_ativo: string;
+  nomeAtivo: string;  
   raca: string;
-  data_inicio: string;
-  valor_inicial: string;
+  dataInicio: string;
+  valorInicial: string;
+  status: string;   // Adicionando o status
   foto: string;
 }
 
@@ -23,30 +26,46 @@ const TelaMeusLeiloes: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const navigation = useNavigation<MeusLeiloesScreenNavigationProp>();
 
+  // Função para verificar e atualizar o status do leilão baseado na data
+  const atualizarStatusLeiloes = (leiloes: Leilao[]): Leilao[] => {
+    const dataAtual = new Date();
+    return leiloes.map((leilao) => {
+      const dataInicioLeilao = new Date(leilao.dataInicio);
+      if (dataInicioLeilao < dataAtual) {
+        // Atualiza o status para 'Encerrado' se o leilão já passou
+        return { ...leilao, status: 'Encerrado' };
+      }
+      return leilao; // Mantém o status atual se ainda estiver ativo
+    });
+  };
+
   useEffect(() => {
     const fetchLeiloes = async () => {
       try {
-        // Recupera o token do AsyncStorage
         const token = await AsyncStorage.getItem('authToken');
         if (!token) {
           Alert.alert('Erro', 'Token não encontrado, faça login novamente.');
           return;
         }
 
-        const response = await api.get('/meus-leiloes', {
+        // Faz a requisição para buscar os leilões
+        const response = await api.get('/leiloes/meus-leiloes', {
           headers: {
-            'Authorization': `Bearer ${token}`, // Enviando o token no cabeçalho
+            'Authorization': `Bearer ${token}`, 
           },
         });
 
-        console.log('Leilões recebidos:', response.data); // Log para verificar se os leilões estão sendo recebidos
-        setLeiloes(response.data);
+        console.log('Leilões recebidos:', JSON.stringify(response.data, null, 2));
+
+        // Atualiza o status dos leilões antes de exibi-los
+        const leiloesAtualizados = atualizarStatusLeiloes(response.data);
+        setLeiloes(leiloesAtualizados);
       } catch (error) {
         const err = error as AxiosError;
+        console.error('Erro ao buscar leilões:', err.response?.data || err.message);
         if (err.response && err.response.status === 404) {
-          setLeiloes([]); // Defina como uma lista vazia se não encontrar nenhum leilão
+          setLeiloes([]); 
         } else {
-          console.error('Erro ao buscar leilões:', err.message);
           Alert.alert('Erro ao buscar leilões', err.message);
         }
       } finally {
@@ -55,19 +74,28 @@ const TelaMeusLeiloes: React.FC = () => {
     };
 
     fetchLeiloes();
-  }, []); // O array vazio como segundo argumento faz com que o useEffect rode apenas uma vez, quando o componente é montado
+  }, []); 
 
   const renderItem = ({ item }: { item: Leilao }) => (
     <TouchableOpacity
       style={styles.leilaoContainer}
-      onPress={() => navigation.navigate('GerenciarLeilao', { leilaoId: item.id })}
+      onPress={() => navigation.navigate('DetalhesLeilao', { leilaoId: item.id })}
     >
-      <Image source={{ uri: item.foto }} style={styles.image} />
+      <Image source={{ uri: item.foto ? `http://localhost:3000/uploads/${item.foto}` : 'default_image_url' }} style={styles.image} />
       <View style={styles.infoContainer}>
-        <Text style={styles.nomeAtivo}>{item.nome_ativo}</Text>
+        <Text style={styles.nomeAtivo}>{item.nomeAtivo}</Text>
         <Text style={styles.raca}>Raça: {item.raca}</Text>
-        <Text style={styles.dataInicio}>Início: {new Date(item.data_inicio).toLocaleDateString()}</Text>
-        <Text style={styles.valorInicial}>Valor Inicial: R${item.valor_inicial}</Text>
+        <Text style={styles.dataInicio}>Início: {new Date(item.dataInicio).toLocaleDateString()}</Text>
+        <Text style={styles.valorInicial}>Valor Inicial: R${item.valorInicial}</Text>
+        {/* Exibindo o status e mudando a cor */}
+        <Text
+          style={[
+            styles.status,
+            item.status === 'Encerrado' ? styles.statusEncerrado : styles.statusAberto
+          ]}
+        >
+          Status: {item.status}
+        </Text>
       </View>
     </TouchableOpacity>
   );
@@ -152,6 +180,16 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#BB86FC',
     marginTop: 5,
+  },
+  status: {
+    fontSize: 16,
+    marginTop: 5,
+  },
+  statusAberto: {
+    color: '#4CAF50', // Verde para leilão aberto
+  },
+  statusEncerrado: {
+    color: '#FF0000', // Vermelho para leilão encerrado
   },
   loadingContainer: {
     flex: 1,

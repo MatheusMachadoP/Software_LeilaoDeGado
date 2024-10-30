@@ -1,30 +1,38 @@
 import { Request, Response, NextFunction } from 'express';
 import { validate } from 'class-validator';
-import { Usuario } from '../entity/Usuario';
 import { plainToClass } from 'class-transformer';
+import { Usuario } from '../entity/Usuario';
 
-export const validateUsuario = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    console.log('Recebendo dados para validação:', req.body);
+const validateUsuario = (req: Request, res: Response, next: NextFunction) => {
+    (async () => {
+        try {
+            // Convert the request body to a Usuario instance
+            const usuario = plainToClass(Usuario, req.body);
 
-    const usuario = plainToClass(Usuario, req.body);
-    console.log('Validando a instância:', usuario);
+            // Validate the Usuario instance
+            const errors = await validate(usuario);
 
-    const errors = await validate(usuario);
+            if (errors.length > 0) {
+                // Format validation errors
+                const formattedErrors = errors.map((error) => ({
+                    field: error.property,
+                    issues: error.constraints,
+                }));
 
-    if (errors.length > 0) {
-      console.log('Erros de validação:', errors);
-      return res.status(400).json({
-        message: 'Erro de validação nos dados fornecidos.',
-        details: errors,
-      });
-    }
+                res.status(400).json({
+                    message: 'Validation error',
+                    errors: formattedErrors,
+                });
+                return;
+            }
 
-    next();
-  } catch (error) {
-    console.error('Erro no middleware de validação:', error);
-    next(error);
-  }
+            // Proceed if validation is successful
+            next();
+        } catch (error) {
+            console.error('Error validating user:', error);
+            next(error); // Pass the error to the error-handling middleware
+        }
+    })();
 };
 
-
+export default validateUsuario;

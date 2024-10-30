@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Image, Alert } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Certifique-se de instalar e importar o AsyncStorage
 import { RootStackParamList } from './App';
 import api from './api/api';
 
@@ -24,27 +23,36 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
       Alert.alert('Erro', 'Por favor, preencha todos os campos');
       return;
     }
-  
-    try {
-      console.log('URL Base:', api.defaults.baseURL);
 
-      const response = await api.post('/login', {
-        email: email,
-        senha: senha,
-      });
+    try {
+      console.log('Tentando login com:', email);
+
+      const response = await api.post('/login', { email, senha });
 
       console.log('Resposta da API:', response.data);
 
-      // Armazene o token JWT usando AsyncStorage
-      const { token } = response.data;
-      await AsyncStorage.setItem('authToken', token);
+      if (response.status === 200) {
+        const { token, tipo_usuario } = response.data;
 
-      Alert.alert('Sucesso', 'Login realizado com sucesso!');
-      navigation.navigate('BoasVindas');
+        // Armazena o token JWT (você pode usar AsyncStorage ou outro método)
+        // AsyncStorage.setItem('token', token);
+
+        // Redireciona o usuário com base no tipo de usuário
+        if (tipo_usuario === 'Leiloeiro') {
+          navigation.navigate('Carteira', { address: 'endereco_da_carteira', userType: 'Leiloeiro' });
+        } else if (tipo_usuario === 'Licitante') {
+          navigation.navigate('Carteira', { address: 'endereco_da_carteira', userType: 'Licitante' });
+        } else {
+          Alert.alert('Tipo de usuário desconhecido');
+        }
+      }
     } catch (error: any) {
       console.error('Erro ao fazer login:', error);
 
       if (error.response) {
+        console.log('Status do erro:', error.response.status);
+        console.log('Dados do erro:', error.response.data);
+
         if (error.response.status === 404) {
           Alert.alert('Erro', 'Usuário não encontrado');
         } else if (error.response.status === 401) {
@@ -57,7 +65,7 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
       }
     }
   };
-  
+
   return (
     <View style={styles.container}>
       <Image source={require('./assets/logo.png')} style={styles.mainLogo} />

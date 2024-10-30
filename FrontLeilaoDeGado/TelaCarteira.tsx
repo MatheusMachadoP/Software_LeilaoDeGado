@@ -1,31 +1,59 @@
-import React from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from './App';
 import { useWalletConnectModal } from '@walletconnect/modal-react-native';
 
-type CarteiraScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Carteira'>; // Define o tipo de navegação para a tela Carteira
-type CarteiraScreenRouteProp = RouteProp<RootStackParamList, 'Carteira'>; // Define o tipo de rota para a tela Carteira
+type CarteiraScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Carteira'>;
+type CarteiraScreenRouteProp = RouteProp<RootStackParamList, 'Carteira'>;
 
 type Props = {
-  navigation: CarteiraScreenNavigationProp; // Prop para navegação
-  route: CarteiraScreenRouteProp; // Prop para a rota
+  navigation: CarteiraScreenNavigationProp;
+  route: CarteiraScreenRouteProp;
 };
 
-const TelaCarteira: React.FC<Props> = ({ navigation, route }) => {
-  const { address } = route.params; // Obtém o parâmetro 'address' da rota
-  const { provider, open, isConnected } = useWalletConnectModal(); // Hooks do WalletConnect para gerenciar o estado da conexão
+const TelaCarteira: React.FC<Props> = ({ route, navigation }) => {
+  const { address, userType } = route.params;
+  const { provider } = useWalletConnectModal();
 
-  // Função para lidar com a desconexão
+  // Verifica o tipo de usuário ao carregar a tela
+  useEffect(() => {
+    if (!userType) {
+      Alert.alert("Erro", "Tipo de usuário não definido.");
+      navigation.navigate('BoasVindas');
+    } else {
+      console.log("Tipo de usuário recebido:", userType); // Log para verificar o valor de userType
+    }
+  }, [userType]);
+
+  // Função de desconexão com confirmação
   const handleDisconnect = async () => {
     if (provider) {
-      await provider.disconnect(); // Desconecta o provedor
-      navigation.navigate('BoasVindas'); // Navega para a tela de boas-vindas
+      await provider.disconnect();
+      console.log("Desconectado da carteira anterior."); // Log para confirmar desconexão
+      navigation.navigate('BoasVindas');
+    } else {
+      Alert.alert("Erro", "Nenhum provedor conectado.");
     }
   };
 
-  // Retorno do JSX que define a interface do usuário para a tela de carteira
+  // Função para navegar para a tela do usuário com base no tipo
+  const navigateToUserScreen = () => {
+    console.log("Tipo de usuário para navegação:", userType);
+    switch (userType) {
+      case 'Licitante':
+        navigation.navigate('Licitante');
+        break;
+      case 'Leiloeiro':
+        navigation.navigate('GerenciarLeilao');
+        break;
+      default:
+        Alert.alert("Erro", "Tipo de usuário desconhecido.");
+        navigation.navigate('BoasVindas');
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.card}>
@@ -35,9 +63,11 @@ const TelaCarteira: React.FC<Props> = ({ navigation, route }) => {
         <Text style={styles.cardSubtitle}><Text style={styles.boldText}>Nome:</Text> Matheus Machado</Text>
         <Text style={styles.connectedText}>Conectado</Text>
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Escolha')}>
+
+      <TouchableOpacity style={styles.button} onPress={navigateToUserScreen}>
         <Text style={styles.buttonText}>Continuar</Text>
       </TouchableOpacity>
+      
       <TouchableOpacity style={styles.disconnectButton} onPress={handleDisconnect}>
         <Text style={styles.disconnectButtonText}>Desconectar</Text>
       </TouchableOpacity>

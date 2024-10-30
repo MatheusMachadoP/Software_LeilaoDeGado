@@ -14,14 +14,8 @@ const TelaGerenciarLeilao: React.FC = () => {
         <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('CriarLeilao')}>
           <Text style={styles.menuButtonText}>Criar Leilão</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('MeusLeiloes')}>
+        <TouchableOpacity style={styles.menuButton} onPress={() => navigation.navigate('DetalhesLeilao', { leilaoId: 'leilaoId' })}>
           <Text style={styles.menuButtonText}>Meus Leilões</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuButton} onPress={() => { /* Ação de editar leilão */ }}>
-          <Text style={styles.menuButtonText}>Editar Leilão</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuButton} onPress={() => { /* Ação de excluir leilão */ }}>
-          <Text style={styles.menuButtonText}>Excluir Leilão</Text>
         </TouchableOpacity>
       </View>
     </View>

@@ -6,9 +6,7 @@ import path from "path";
 dotenv.config({ path: path.resolve(__dirname, "..", ".env") });
 
 // Importa as suas entidades aqui
-import { Perfil } from "./entity/Perfil";
 import { Usuario } from "./entity/Usuario";
-import { UsuarioPerfil } from "./entity/UsuarioPerfil";
 import { Leilao } from "./entity/Leilao";
 import { Lance } from "./entity/Lance";
 import { Transacao } from "./entity/Transacao";
@@ -30,9 +28,7 @@ export const AppDataSource = new DataSource({
   synchronize: true, // Desative em produção!
   logging: false,
   entities: [
-    Perfil,
     Usuario,
-    UsuarioPerfil,
     Leilao,
     Lance,
     Transacao,

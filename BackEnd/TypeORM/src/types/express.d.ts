@@ -1,7 +1,10 @@
+// src/types/express.d.ts
 import { Usuario } from '../entity/Usuario';
 
-declare module 'express-serve-static-core' {
-  interface Request {
-    user?: Usuario;
+declare global {
+  namespace Express {
+    interface Request {
+      user?: Usuario; // Ajuste o tipo conforme necessário
+    }
   }
 }

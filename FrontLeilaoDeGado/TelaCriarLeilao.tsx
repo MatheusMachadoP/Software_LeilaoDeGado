@@ -1,37 +1,70 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Image } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import * as ImagePicker from 'expo-image-picker';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import api from './api/api';
-import { RootStackParamList } from './App';
-import { format } from 'date-fns';
-import AsyncStorage from '@react-native-async-storage/async-storage';  // Importar o AsyncStorage
+import React, { useState } from "react";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  Image,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { StackNavigationProp } from "@react-navigation/stack";
+import * as ImagePicker from "expo-image-picker";
+import api from "./api/api";
+import { RootStackParamList } from "./App";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-type CriarLeilaoScreenNavigationProp = StackNavigationProp<RootStackParamList, 'CriarLeilao'>;
+type CriarLeilaoScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "CriarLeilao"
+>;
 
 const formatDate = (date: Date) => {
   return date.toISOString();
 };
 
-const TelaCriarLeilao: React.FC = () => {
-  const [nomeAtivo, setNomeAtivo] = useState('');
-  const [raca, setRaca] = useState('');
+const CriarLeilao: React.FC = () => {
+  const [nomeAtivo, setNomeAtivo] = useState("");
+  const [raca, setRaca] = useState("");
   const [dataInicio, setDataInicio] = useState<Date | null>(null);
-  const [valorInicial, setValorInicial] = useState('');
-  const [duracao, setDuracao] = useState('');
-  const [descricao, setDescricao] = useState('');
+  const [horaInicio, setHoraInicio] = useState<Date | null>(null);
+  const [valorInicial, setValorInicial] = useState("");
+  const [horasDuracao, setHorasDuracao] = useState(""); 
+  const [minutosDuracao, setMinutosDuracao] = useState("");  
+  const [descricao, setDescricao] = useState("");
   const [image, setImage] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
   const navigation = useNavigation<CriarLeilaoScreenNavigationProp>();
 
-  const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      setDataInicio(selectedDate);
-    }
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const showTimePicker = () => {
+    setTimePickerVisibility(true);
+  };
+
+  const hideTimePicker = () => {
+    setTimePickerVisibility(false);
+  };
+
+  const handleConfirmDate = (date: Date) => {
+    setDataInicio(date);
+    hideDatePicker();
+  };
+
+  const handleConfirmTime = (time: Date) => {
+    setHoraInicio(time);
+    hideTimePicker();
   };
 
   const validateFields = () => {
@@ -39,27 +72,31 @@ const TelaCriarLeilao: React.FC = () => {
     let errors: { [key: string]: string } = {};
 
     if (!nomeAtivo) {
-      errors.nomeAtivo = 'Nome do ativo é obrigatório';
+      errors.nomeAtivo = "Nome do ativo é obrigatório";
       valid = false;
     }
     if (!raca) {
-      errors.raca = 'Raça é obrigatória';
+      errors.raca = "Raça é obrigatória";
       valid = false;
     }
     if (!dataInicio) {
-      errors.dataInicio = 'Data de início é obrigatória';
+      errors.dataInicio = "Data de início é obrigatória";
+      valid = false;
+    }
+    if (!horaInicio) {
+      errors.horaInicio = "Hora de início é obrigatória";
       valid = false;
     }
     if (!valorInicial) {
-      errors.valorInicial = 'Valor inicial é obrigatório';
+      errors.valorInicial = "Valor inicial é obrigatório";
       valid = false;
     }
-    if (!duracao) {
-      errors.duracao = 'Duração é obrigatória';
+    if (!horasDuracao || !minutosDuracao) {
+      errors.duracao = "Duração é obrigatória (horas e minutos)";
       valid = false;
     }
     if (!descricao) {
-      errors.descricao = 'Descrição é obrigatória';
+      errors.descricao = "Descrição é obrigatória";
       valid = false;
     }
 
@@ -93,46 +130,46 @@ const TelaCriarLeilao: React.FC = () => {
     }
 
     try {
-      // Recupera o token do AsyncStorage, que foi armazenado durante o login
-      const token = await AsyncStorage.getItem('authToken');
+      const token = await AsyncStorage.getItem("authToken");
       if (!token) {
-        Alert.alert('Erro', 'Token não encontrado, faça login novamente.');
+        Alert.alert("Erro", "Token não encontrado, faça login novamente.");
         return;
       }
 
+      // Combinando a data e hora de início
+      const inicioCompleto = new Date(
+        dataInicio!.setHours(horaInicio!.getHours(), horaInicio!.getMinutes())
+      );
+
       const formData = new FormData();
-      formData.append('nome_ativo', nomeAtivo);
-      formData.append('raca', raca);
-      const formattedDataInicio = dataInicio ? formatDate(dataInicio) : '';
-      formData.append('data_inicio', formattedDataInicio);
-      formData.append('valor_inicial', valorInicial);
-      formData.append('duracao', duracao);
-      formData.append('descricao', descricao);
+      formData.append("nome_ativo", nomeAtivo);
+      formData.append("raca", raca);
+      formData.append("data_inicio", formatDate(inicioCompleto));
+      formData.append("valor_inicial", valorInicial);
+      formData.append("horasDuracao", horasDuracao);
+      formData.append("minutosDuracao", minutosDuracao);
+      formData.append("descricao", descricao);
 
       if (image) {
-        formData.append('foto', {
+        formData.append("foto", {
           uri: image,
-          name: 'leilao.jpg',
-          type: 'image/jpeg',
+          name: "leilao.jpg",
+          type: "image/jpeg",
         } as any);
       }
 
-      console.log('FormData being sent:', formData);
-
-      // Envia a requisição com o token no cabeçalho
-      const response = await api.post('/leiloes', formData, {
+      const response = await api.post("/leiloes", formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
-          'Authorization': `Bearer ${token}`, // Inclui o token corretamente
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
         },
       });
 
-      console.log('Leilão criado:', response.data);
-      Alert.alert('Sucesso', 'Leilão criado com sucesso!');
-      navigation.navigate('GerenciarLeilao', { leilaoId: response.data.leilao.id });
+      Alert.alert("Sucesso", "Leilão criado com sucesso!");
+      navigation.navigate("GerenciarLeilao");
     } catch (error) {
-      console.error('Erro ao criar leilão:', error);
-      Alert.alert('Erro', 'Não foi possível criar o leilão');
+      console.error("Erro ao criar leilão:", error);
+      Alert.alert("Erro", "Não foi possível criar o leilão");
     }
   };
 
@@ -157,21 +194,49 @@ const TelaCriarLeilao: React.FC = () => {
         />
         {errors.raca && <Text style={styles.errorText}>{errors.raca}</Text>}
 
-        <TouchableOpacity style={styles.buttondata} onPress={() => setShowDatePicker(true)}>
+        <TouchableOpacity style={styles.buttondata} onPress={showDatePicker}>
           <Text style={styles.buttonText}>
-            {dataInicio ? dataInicio.toLocaleDateString() : 'Escolha a Data de Início'}
+            {dataInicio ? dataInicio.toLocaleDateString() : "Escolha a Data de Início"}
           </Text>
         </TouchableOpacity>
-
-        {showDatePicker && (
-          <DateTimePicker
-            value={dataInicio || new Date()}
-            mode="date"
-            display="default"
-            onChange={onDateChange}
-          />
-        )}
+        <DateTimePickerModal
+          isVisible={isDatePickerVisible}
+          mode="date"
+          onConfirm={handleConfirmDate}
+          onCancel={hideDatePicker}
+        />
         {errors.dataInicio && <Text style={styles.errorText}>{errors.dataInicio}</Text>}
+
+        <TouchableOpacity style={styles.buttondata} onPress={showTimePicker}>
+          <Text style={styles.buttonText}>
+            {horaInicio ? horaInicio.toLocaleTimeString() : "Escolha a Hora de Início"}
+          </Text>
+        </TouchableOpacity>
+        <DateTimePickerModal
+          isVisible={isTimePickerVisible}
+          mode="time"
+          onConfirm={handleConfirmTime}
+          onCancel={hideTimePicker}
+        />
+        {errors.horaInicio && <Text style={styles.errorText}>{errors.horaInicio}</Text>}
+
+        <TextInput
+          placeholder="Horas de Duração"
+          placeholderTextColor="#888"
+          style={[styles.input, errors.duracao ? styles.inputError : null]}
+          value={horasDuracao}
+          onChangeText={setHorasDuracao}
+          keyboardType="numeric"
+        />
+        <TextInput
+          placeholder="Minutos de Duração"
+          placeholderTextColor="#888"
+          style={[styles.input, errors.duracao ? styles.inputError : null]}
+          value={minutosDuracao}
+          onChangeText={setMinutosDuracao}
+          keyboardType="numeric"
+        />
+        {errors.duracao && <Text style={styles.errorText}>{errors.duracao}</Text>}
 
         <TextInput
           placeholder="Valor Inicial"
@@ -182,16 +247,6 @@ const TelaCriarLeilao: React.FC = () => {
           keyboardType="numeric"
         />
         {errors.valorInicial && <Text style={styles.errorText}>{errors.valorInicial}</Text>}
-
-        <TextInput
-          placeholder="Duração (em horas)"
-          placeholderTextColor="#888"
-          style={[styles.input, errors.duracao ? styles.inputError : null]}
-          value={duracao}
-          onChangeText={setDuracao}
-          keyboardType="numeric"
-        />
-        {errors.duracao && <Text style={styles.errorText}>{errors.duracao}</Text>}
 
         <TextInput
           placeholder="Descrição"
@@ -220,61 +275,61 @@ const TelaCriarLeilao: React.FC = () => {
 const styles = StyleSheet.create({
   scrollContainer: {
     flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingVertical: 20,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   container: {
-    width: '100%',
+    width: "100%",
     paddingHorizontal: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   input: {
-    backgroundColor: '#222',
-    color: '#fff',
+    backgroundColor: "#222",
+    color: "#fff",
     padding: 15,
     marginVertical: 10,
     borderRadius: 5,
-    width: '100%',
+    width: "100%",
   },
   inputError: {
-    borderColor: 'red',
+    borderColor: "red",
     borderWidth: 1,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     marginBottom: 10,
   },
   button: {
-    backgroundColor: '#BB86FC',
+    backgroundColor: "#BB86FC",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginVertical: 20,
-    alignItems: 'center',
-    width: '100%',
+    alignItems: "center",
+    width: "100%",
   },
   buttondata: {
-    backgroundColor: '#34361b',
+    backgroundColor: "#34361b",
     paddingVertical: 15,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginVertical: 20,
-    alignItems: 'center',
-    width: '80%',
+    alignItems: "center",
+    width: "80%",
   },
   buttonIMG: {
-    backgroundColor: '#2e0206',
+    backgroundColor: "#2e0206",
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginVertical: 20,
-    alignItems: 'center',
-    width: '58%',
+    alignItems: "center",
+    width: "58%",
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
   },
   image: {
@@ -285,4 +340,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TelaCriarLeilao;
+export default CriarLeilao;
