@@ -17,7 +17,7 @@ interface Leilao {
   raca: string;
   dataInicio: string;
   valorInicial: string;
-  status: string;   // Adicionando o status
+  status: string; 
   foto: string;
 }
 
@@ -32,10 +32,9 @@ const TelaMeusLeiloes: React.FC = () => {
     return leiloes.map((leilao) => {
       const dataInicioLeilao = new Date(leilao.dataInicio);
       if (dataInicioLeilao < dataAtual) {
-        // Atualiza o status para 'Encerrado' se o leilão já passou
         return { ...leilao, status: 'Encerrado' };
       }
-      return leilao; // Mantém o status atual se ainda estiver ativo
+      return leilao;
     });
   };
 
@@ -48,7 +47,7 @@ const TelaMeusLeiloes: React.FC = () => {
           return;
         }
 
-        // Faz a requisição para buscar os leilões
+        // Faz a requisição para buscar os leilões criados pelo leiloeiro
         const response = await api.get('/leiloes/meus-leiloes', {
           headers: {
             'Authorization': `Bearer ${token}`, 
@@ -56,15 +55,13 @@ const TelaMeusLeiloes: React.FC = () => {
         });
 
         console.log('Leilões recebidos:', JSON.stringify(response.data, null, 2));
-
-        // Atualiza o status dos leilões antes de exibi-los
         const leiloesAtualizados = atualizarStatusLeiloes(response.data);
         setLeiloes(leiloesAtualizados);
       } catch (error) {
         const err = error as AxiosError;
         console.error('Erro ao buscar leilões:', err.response?.data || err.message);
         if (err.response && err.response.status === 404) {
-          setLeiloes([]); 
+          setLeiloes([]);
         } else {
           Alert.alert('Erro ao buscar leilões', err.message);
         }
@@ -76,18 +73,18 @@ const TelaMeusLeiloes: React.FC = () => {
     fetchLeiloes();
   }, []); 
 
+  const handleAcompanharLeilao = (id: string) => {
+    navigation.navigate('DetalhesLeilao', { leilaoId: id });
+  };
+
   const renderItem = ({ item }: { item: Leilao }) => (
-    <TouchableOpacity
-      style={styles.leilaoContainer}
-      onPress={() => navigation.navigate('DetalhesLeilao', { leilaoId: item.id })}
-    >
+    <View style={styles.leilaoContainer}>
       <Image source={{ uri: item.foto ? `http://localhost:3000/uploads/${item.foto}` : 'default_image_url' }} style={styles.image} />
       <View style={styles.infoContainer}>
         <Text style={styles.nomeAtivo}>{item.nomeAtivo}</Text>
         <Text style={styles.raca}>Raça: {item.raca}</Text>
         <Text style={styles.dataInicio}>Início: {new Date(item.dataInicio).toLocaleDateString()}</Text>
         <Text style={styles.valorInicial}>Valor Inicial: R${item.valorInicial}</Text>
-        {/* Exibindo o status e mudando a cor */}
         <Text
           style={[
             styles.status,
@@ -96,8 +93,12 @@ const TelaMeusLeiloes: React.FC = () => {
         >
           Status: {item.status}
         </Text>
+        {/* Botão de acompanhar */}
+        <TouchableOpacity style={styles.acompanharButton} onPress={() => handleAcompanharLeilao(item.id)}>
+          <Text style={styles.acompanharButtonText}>Acompanhar</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 
   if (loading) {
@@ -186,10 +187,22 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   statusAberto: {
-    color: '#4CAF50', // Verde para leilão aberto
+    color: '#4CAF50',
   },
   statusEncerrado: {
-    color: '#FF0000', // Vermelho para leilão encerrado
+    color: '#FF0000',
+  },
+  acompanharButton: {
+    marginTop: 10,
+    backgroundColor: '#03DAC6',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  acompanharButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,

@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View, Text, Image, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from './App';
-import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from './api/api'; // Importando a instância do axios
+import { isAddress } from 'ethers'; // Importando isAddress de ethers.js
 
 type CarteiraScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Carteira'>;
 type CarteiraScreenRouteProp = RouteProp<RootStackParamList, 'Carteira'>;
@@ -14,8 +16,9 @@ type Props = {
 };
 
 const TelaCarteira: React.FC<Props> = ({ route, navigation }) => {
-  const { address, userType } = route.params;
-  const { provider } = useWalletConnectModal();
+  const { address, userType, userId } = route.params; // Adicionando userId
+  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const [manualAddress, setManualAddress] = useState<string>('');
 
   // Verifica o tipo de usuário ao carregar a tela
   useEffect(() => {
@@ -27,14 +30,48 @@ const TelaCarteira: React.FC<Props> = ({ route, navigation }) => {
     }
   }, [userType]);
 
-  // Função de desconexão com confirmação
-  const handleDisconnect = async () => {
-    if (provider) {
-      await provider.disconnect();
-      console.log("Desconectado da carteira anterior."); // Log para confirmar desconexão
+  // Função para conectar a carteira manualmente
+  const handleManualConnect = async () => {
+    if (!manualAddress) {
+      Alert.alert("Erro", "Por favor, insira a chave pública da carteira.");
+      return;
+    }
+
+    // Validar o endereço da carteira usando ethers.js
+    if (!isAddress(manualAddress)) {
+      Alert.alert("Erro", "Endereço de carteira inválido.");
+      return;
+    }
+
+    try {
+      setWalletAddress(manualAddress);
+      await AsyncStorage.setItem('walletAddress', manualAddress);
+
+      // Enviar o endereço da carteira para o backend
+      await api.post('/api/usuarios/update-wallet-address', { userId, walletAddress: manualAddress });
+
+      Alert.alert("Sucesso", "Carteira conectada com sucesso!");
+    } catch (error) {
+      console.error("Erro ao conectar a carteira:", error);
+      Alert.alert("Erro", "Não foi possível conectar a carteira.");
+    }
+  };
+
+  // Função para desconectar a carteira
+  const handleDisconnectWallet = async () => {
+    console.log("Tentando desconectar a carteira...");
+    try {
+      setWalletAddress(null);
+      await AsyncStorage.removeItem('walletAddress');
+
+      // Enviar a remoção do endereço da carteira para o backend
+      await api.post('/api/usuarios/remove-wallet-address', { userId });
+
+      Alert.alert("Sucesso", "Carteira desconectada com sucesso!");
       navigation.navigate('BoasVindas');
-    } else {
-      Alert.alert("Erro", "Nenhum provedor conectado.");
+    } catch (error) {
+      console.error("Erro ao desconectar a carteira:", error);
+      Alert.alert("Erro", "Não foi possível desconectar a carteira.");
     }
   };
 
@@ -59,16 +96,28 @@ const TelaCarteira: React.FC<Props> = ({ route, navigation }) => {
       <View style={styles.card}>
         <Image source={require('./assets/metamask-logo.png')} style={styles.logo} />
         <Text style={styles.cardTitle}>METAMASK</Text>
-        <Text style={styles.cardSubtitle}><Text style={styles.boldText}>Chave Pública:</Text> {address}</Text>
-        <Text style={styles.cardSubtitle}><Text style={styles.boldText}>Nome:</Text> Matheus Machado</Text>
+        <Text style={styles.cardSubtitle}><Text style={styles.boldText}>Chave Pública:</Text> {walletAddress || address}</Text>
+        <Text style={styles.cardSubtitle}><Text style={styles.boldText}>Nome:</Text> {userId}</Text>
         <Text style={styles.connectedText}>Conectado</Text>
       </View>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Insira a chave pública da carteira"
+        placeholderTextColor="#888"
+        value={manualAddress}
+        onChangeText={setManualAddress}
+      />
 
       <TouchableOpacity style={styles.button} onPress={navigateToUserScreen}>
         <Text style={styles.buttonText}>Continuar</Text>
       </TouchableOpacity>
       
-      <TouchableOpacity style={styles.disconnectButton} onPress={handleDisconnect}>
+      <TouchableOpacity style={styles.connectButton} onPress={handleManualConnect}>
+        <Text style={styles.connectButtonText}>Conectar Carteira Manualmente</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.disconnectButton} onPress={handleDisconnectWallet}>
         <Text style={styles.disconnectButtonText}>Desconectar</Text>
       </TouchableOpacity>
     </View>
@@ -116,6 +165,14 @@ const styles = StyleSheet.create({
     marginTop: 10,
     fontWeight: 'bold',
   },
+  input: {
+    backgroundColor: '#222',
+    color: '#fff',
+    padding: 15,
+    marginVertical: 10,
+    borderRadius: 5,
+    width: '100%',
+  },
   button: {
     backgroundColor: '#03DAC6',
     paddingVertical: 15,
@@ -125,6 +182,18 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   buttonText: {
+    color: '#000000',
+    fontSize: 18,
+  },
+  connectButton: {
+    backgroundColor: '#03DAC6',
+    paddingVertical: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+    width: '100%',
+    marginBottom: 20,
+  },
+  connectButtonText: {
     color: '#000000',
     fontSize: 18,
   },

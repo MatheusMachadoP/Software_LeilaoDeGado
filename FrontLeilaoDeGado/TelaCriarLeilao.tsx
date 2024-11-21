@@ -155,7 +155,7 @@ const CriarLeilao: React.FC = () => {
           uri: image,
           name: "leilao.jpg",
           type: "image/jpeg",
-        } as any);
+        } as unknown as Blob);
       }
 
       const response = await api.post("/leiloes", formData, {

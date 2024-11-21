@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "my-new-project",
-    "slug": "my-new-project",
+    "name": "crud-leilao",
+    "slug": "crud-leilao",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

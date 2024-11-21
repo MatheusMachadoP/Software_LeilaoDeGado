@@ -1,25 +1,20 @@
+// src/routes/leilao.ts
 import express from 'express';
-import { createLeilao, getLeiloesDisponiveis, getLeilaoById } from '../controllers/leilaoController';
-import multer from 'multer';
-import path from 'path';
-
-// Configuração do multer
-const uploadDir = path.join(__dirname, '../uploads');
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, uploadDir);
-  },
-  filename: function (req, file, cb) {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
-const upload = multer({ storage });
+import { 
+  createLeilao, 
+  getLeiloesDisponiveis, 
+  getLeilaoById, 
+  participarLeilao 
+} from '../controllers/leilaoController';
+import { uploadMiddleware } from '../controllers/leilaoController'; // Importa de leilaoController.ts
+import authenticateJWT from '../middlewares/authenticateJWT';
 
 const router = express.Router();
 
 // Rotas
-router.post('/', upload.single('foto'), createLeilao);
-router.get('/disponiveis', getLeiloesDisponiveis);
-router.get('/:id', getLeilaoById);
+router.post('/', authenticateJWT, uploadMiddleware, createLeilao); // POST /api/leiloes
+router.get('/disponiveis', getLeiloesDisponiveis); // GET /api/leiloes/disponiveis
+router.get('/:id', getLeilaoById); // GET /api/leiloes/:id
+router.post('/:id/participar', authenticateJWT, participarLeilao); // POST /api/leiloes/:id/participar
 
 export default router;

@@ -83,3 +83,13 @@ INSERT INTO lance (valor, leilao_id, licitante_id) VALUES
 UPDATE leilao SET "nome_ativo" = 'Ativo Desconhecido' WHERE "nome_ativo" IS NULL;
 
 UPDATE leilao SET "data_inicio" = NOW() WHERE "data_inicio" IS NULL;
+
+-----------
+
+-- Atualizando os dados existentes para garantir que não haja campos nulos
+UPDATE leilao SET nome_ativo = 'Ativo Desconhecido' WHERE nome_ativo IS NULL;
+UPDATE leilao SET data_inicio = NOW() WHERE data_inicio IS NULL;
+UPDATE leilao SET horas_duracao = 0 WHERE horas_duracao IS NULL;
+UPDATE leilao SET minutos_duracao = 0 WHERE minutos_duracao IS NULL;
+UPDATE leilao SET valor_inicial = 0 WHERE valor_inicial IS NULL;
+UPDATE leilao SET status = 'Aberto' WHERE status IS NULL;

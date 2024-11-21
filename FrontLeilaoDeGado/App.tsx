@@ -12,13 +12,15 @@ import TelaCriarLeilao from './TelaCriarLeilao';
 import TelaGerenciarLeilao from './TelaGerenciarLeilao';
 import TelaMeusLeiloes from './TelaMeusLeiloes';
 import TelaDetalhesLeilao from './TelaDetalhesLeilao';
+import TelaParticiparLeilao from './TelaParticiparLeilao';
+import TelaRealizarLances from './TelaRealizarLances';
 
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Cadastro: undefined;
   BoasVindas: undefined;
-  Carteira: { address: string; userType: 'Licitante' | 'Leiloeiro' };
+  Carteira: { address: string; userType: 'Licitante' | 'Leiloeiro'; userId: string };
   Escolha: undefined;
   Leiloeiro: undefined;
   Licitante: undefined;
@@ -26,6 +28,8 @@ export type RootStackParamList = {
   GerenciarLeilao: undefined;
   MeusLeiloes: undefined;
   DetalhesLeilao: { leilaoId: string };
+  ParticiparLeilao: { leilaoId: string };
+  TelaRealizarLances: { leilaoId: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -90,6 +94,14 @@ const App: React.FC = () => {
         <Stack.Screen
           name="DetalhesLeilao"
           component={TelaDetalhesLeilao}
+        />
+        <Stack.Screen
+          name="ParticiparLeilao"
+          component={TelaParticiparLeilao}
+        />
+        <Stack.Screen
+          name="TelaRealizarLances"
+          component={TelaRealizarLances}
         />
       </Stack.Navigator>
     </NavigationContainer>

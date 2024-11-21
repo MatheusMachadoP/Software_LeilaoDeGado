@@ -7,10 +7,8 @@ import { AxiosError } from 'axios';
 import { RootStackParamList } from './App';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Tipagem para navegação
 type LicitanteScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Licitante'>;
 
-// Definindo os campos do Leilão conforme esperado pelo backend
 interface Leilao {
   id: number;
   nomeAtivo: string;
@@ -36,22 +34,19 @@ const TelaLicitante: React.FC = () => {
           return;
         }
 
-        // Faz a requisição para buscar todos os leilões com status "Aberto"
         const response = await api.get('/leiloes/disponiveis', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
 
-        console.log('Leilões recebidos:', response.data); // Log para verificar os dados recebidos
-
-        // Definir os leilões abertos no estado
+        console.log('Leilões recebidos:', response.data);
         setLeiloes(response.data);
       } catch (error) {
         const err = error as AxiosError;
         console.error('Erro ao buscar leilões:', err.response?.data || err.message);
         if (err.response && err.response.status === 404) {
-          setLeiloes([]); // Nenhum leilão aberto foi encontrado
+          setLeiloes([]);
         } else {
           Alert.alert('Erro ao buscar leilões', err.message);
         }
@@ -63,36 +58,52 @@ const TelaLicitante: React.FC = () => {
     fetchLeiloes();
   }, []);
 
-  // Converte o ID para string ao navegar
-  const handleNavigate = (id: number) => {
-    console.log('ID sendo navegado:', id); // Verifique se o ID está correto
-    navigation.navigate('DetalhesLeilao', { leilaoId: id.toString() }); // Converte o ID para string
+  const handleParticipar = async (id: number) => {
+    try {
+      const token = await AsyncStorage.getItem('authToken');
+      if (!token) {
+        Alert.alert('Erro', 'Token não encontrado, faça login novamente.');
+        return;
+      }
+  
+      // Envia a requisição para participar do leilão
+      const response = await api.post(`/leiloes/${id}/participar`, {}, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+  
+      Alert.alert('Sucesso', response.data.message);
+      // Redireciona para a tela de participar do leilão
+      navigation.navigate('ParticiparLeilao', { leilaoId: id.toString() });
+    } catch (error) {
+      const err = error as AxiosError;
+      console.error('Erro ao participar do leilão:', err.response?.data || err.message);
+      Alert.alert('Erro', 'Não foi possível participar do leilão.');
+    }
   };
+  
 
   const renderItem = ({ item }: { item: Leilao }) => (
-    <TouchableOpacity
-      style={styles.leilaoContainer}
-      onPress={() => handleNavigate(item.id)}
-    >
+    <View style={styles.leilaoContainer}>
       <Image source={{ uri: item.foto ? `http://localhost:3000/uploads/${item.foto}` : 'default_image_url' }} style={styles.image} />
       <View style={styles.infoContainer}>
         <Text style={styles.nomeAtivo}>{item.nomeAtivo}</Text>
         <Text style={styles.raca}>Raça: {item.raca}</Text>
         <Text style={styles.dataInicio}>Início: {new Date(item.dataInicio).toLocaleDateString()}</Text>
-  
-        {/* Converte valorInicial para número antes de formatar */}
         <Text style={styles.valorInicial}>
           Valor Inicial: R${parseFloat(item.valorInicial.toString() || '0').toFixed(2)}
         </Text>
-        
         <Text style={[styles.status, styles.statusAberto]}>
           Status: {item.status}
         </Text>
+        {/* Botão para participar do leilão */}
+        <TouchableOpacity style={styles.participarButton} onPress={() => handleParticipar(item.id)}>
+          <Text style={styles.participarButtonText}>Participar</Text>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
-  
-  
 
   if (loading) {
     return (
@@ -180,7 +191,19 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   statusAberto: {
-    color: '#4CAF50', // Verde para leilão aberto
+    color: '#4CAF50',
+  },
+  participarButton: {
+    marginTop: 10,
+    backgroundColor: '#03DAC6',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  participarButtonText: {
+    color: '#000',
+    fontWeight: 'bold',
   },
   loadingContainer: {
     flex: 1,

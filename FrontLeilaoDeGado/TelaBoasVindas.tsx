@@ -30,13 +30,6 @@ const TelaBoasVindas: React.FC<Props> = ({ navigation }) => {
   // Add in the useWalletConnectModal hook + props
   const { open, isConnected, address, provider } = useWalletConnectModal();
 
-  // Navegue para a tela 'Carteira' após a conexão
-  useEffect(() => {
-    if (isConnected && address) {
-      navigation.navigate('Carteira', { address, userType: 'Licitante' }); // or 'Leiloeiro' based on your logic
-    }
-  }, [isConnected, address]);
-
   // Function to handle the button press
   const handleButtonPress = async () => {
     if (isConnected) {

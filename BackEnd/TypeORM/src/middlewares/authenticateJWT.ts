@@ -1,26 +1,31 @@
+// src/middlewares/authenticateJWT.ts
+
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { Usuario } from '../entity/Usuario';
+
+interface JwtPayload {
+  userId: number;
+  // Adicione outros campos conforme necessário
+}
 
 const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(401).json({ message: 'Access token is missing or invalid' });
+  if (authHeader) {
+    const token = authHeader.split(' ')[1];
+
+    jwt.verify(token, process.env.JWT_SECRET as string, (err, payload) => {
+      if (err) {
+        return res.sendStatus(403);
+      }
+
+      const { userId } = payload as JwtPayload;
+      req.user = { id: userId };
+      next();
+    });
+  } else {
+    res.sendStatus(401);
   }
-
-  jwt.verify(token, process.env.JWT_SECRET as string, (err, user) => {
-    if (err) {
-      return res.status(403).json({ message: 'Invalid token' });
-    }
-
-    if (typeof user !== 'string') {
-      req.user = user as Usuario; // Assuming `user` is the payload of the token
-    } else {
-      return res.status(403).json({ message: 'Invalid token' });
-    }
-    next();
-  });
 };
 
 export default authenticateJWT;

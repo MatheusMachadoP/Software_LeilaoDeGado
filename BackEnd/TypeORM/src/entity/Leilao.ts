@@ -12,18 +12,18 @@ export enum StatusLeilao {
 @Entity()
 export class Leilao {
   @PrimaryGeneratedColumn()
-  id!: number;
+  id?: number;
 
   @Column({ type: 'text', name: 'nome_ativo' })
-  nomeAtivo!: string;
+  nomeAtivo?: string;
 
   @Column({ nullable: true })
   raca?: string;
 
-  @Column({ type: 'timestamp', name: 'data_inicio' }) // renomeado para consistência com o banco
+  @Column({ type: 'timestamp', name: 'data_inicio' })
   dataInicio!: Date;
 
-  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'valor_inicial' }) // Nome no banco de dados ajustado
+  @Column({ type: 'decimal', precision: 10, scale: 2, name: 'valor_inicial' })
   valorInicial!: number;
 
   @Column({ type: 'int', nullable: true, name: 'horas_duracao' })
@@ -38,10 +38,9 @@ export class Leilao {
   @Column({ nullable: true })
   foto?: string;
 
-  // Relacionamento com o criador (leiloeiro)
   @ManyToOne(() => Usuario, (usuario) => usuario.leiloesCriados, { eager: true })
   @JoinColumn({ name: 'criador_id' })
-  criador!: Usuario;
+  criador?: Usuario;
 
   @Column({
     type: 'enum',
@@ -57,10 +56,9 @@ export class Leilao {
   @OneToMany(() => Lance, (lance) => lance.leilao)
   lances!: Lance[];
 
-  @Column({ type: 'timestamp', nullable: true, name: 'data_termino' }) // Nome no banco de dados ajustado
+  @Column({ type: 'timestamp', nullable: true, name: 'data_termino' })
   dataTermino?: Date;
 
-  // Calcula a data de término antes de inserir ou atualizar o leilão
   @BeforeInsert()
   @BeforeUpdate()
   calcularDataTermino() {

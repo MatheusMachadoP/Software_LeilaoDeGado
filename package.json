@@ -1,5 +1,5 @@
 {
-  "name": "leilao-de-gado",
+  "name": "crud-leilao-gado",
   "version": "1.0.0",
   "description": "Projeto de CRUD para leilão de gado usando Node.js, TypeORM, Express e PostgreSQL",
   "main": "src/index.ts",
@@ -9,19 +9,23 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@types/react": "~18.2.79",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "cors": "^2.8.5",
+    "crud-leilao-gado": "file:",
     "date-fns": "^3.6.0",
     "dotenv": "^10.0.0",
+    "ethers": "^6.13.4",
     "express": "^4.20.0",
     "leilao-de-gado": "file:",
     "multer": "^1.4.5-lts.1",
     "pg": "^8.7.1",
     "pino": "^9.3.2",
     "reflect-metadata": "^0.1.13",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "typescript": "~5.3.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

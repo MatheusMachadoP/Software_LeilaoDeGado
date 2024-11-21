@@ -16,6 +16,52 @@ const checkUserExists = async (email: string, cpf: string) => {
   return { existingUserByEmail, existingUserByCpf };
 };
 
+// Função para atualizar o endereço da carteira do usuário
+export const updateWalletAddress = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { userId, walletAddress } = req.body;
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+    const usuario = await usuarioRepository.findOneBy({ id: userId });
+
+    if (!usuario) {
+      res.status(404).json({ message: 'Usuário não encontrado' });
+      return;
+    }
+
+    usuario.endereco_carteira = walletAddress;
+    await usuarioRepository.save(usuario);
+
+    res.status(200).json({ message: 'Endereço da carteira atualizado com sucesso' });
+  } catch (error) {
+    console.error('Erro ao atualizar o endereço da carteira:', error);
+    res.status(500).json({ message: 'Erro interno ao atualizar o endereço da carteira', error });
+    next(error);
+  }
+};
+
+// Função para remover o endereço da carteira do usuário
+export const removeWalletAddress = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const { userId } = req.body;
+    const usuarioRepository = AppDataSource.getRepository(Usuario);
+    const usuario = await usuarioRepository.findOneBy({ id: userId });
+
+    if (!usuario) {
+      res.status(404).json({ message: 'Usuário não encontrado' });
+      return;
+    }
+
+    usuario.endereco_carteira = undefined;
+    await usuarioRepository.save(usuario);
+
+    res.status(200).json({ message: 'Endereço da carteira removido com sucesso' });
+  } catch (error) {
+    console.error('Erro ao remover o endereço da carteira:', error);
+    res.status(500).json({ message: 'Erro interno ao remover o endereço da carteira', error });
+    next(error);
+  }
+};
+
 // Função para criar novo usuário
 export const createUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { nome_completo, email, telefone_celular, cpf, senha, tipo_usuario } = req.body;

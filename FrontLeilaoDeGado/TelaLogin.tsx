@@ -4,6 +4,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from './App';
 import api from './api/api';
+import axios from 'axios';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 type LoginScreenRouteProp = RouteProp<RootStackParamList, 'Login'>;
@@ -39,17 +40,17 @@ const TelaLogin: React.FC<Props> = ({ navigation }) => {
 
         // Redireciona o usuário com base no tipo de usuário
         if (tipo_usuario === 'Leiloeiro') {
-          navigation.navigate('Carteira', { address: 'endereco_da_carteira', userType: 'Leiloeiro' });
+          navigation.navigate('Carteira', { address: 'endereco_da_carteira', userType: 'Leiloeiro', userId: 'yourUserId' });
         } else if (tipo_usuario === 'Licitante') {
-          navigation.navigate('Carteira', { address: 'endereco_da_carteira', userType: 'Licitante' });
+          navigation.navigate('Carteira', { address: 'endereco_da_carteira', userType: 'Licitante', userId: 'yourUserId' });
         } else {
           Alert.alert('Tipo de usuário desconhecido');
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Erro ao fazer login:', error);
 
-      if (error.response) {
+      if (axios.isAxiosError(error) && error.response) {
         console.log('Status do erro:', error.response.status);
         console.log('Dados do erro:', error.response.data);
 
