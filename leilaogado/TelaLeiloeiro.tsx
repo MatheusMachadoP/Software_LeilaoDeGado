@@ -3,6 +3,7 @@ import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'reac
 import Web3, { AbiItem } from 'web3';
 import { TransactionReceipt } from 'web3';
 
+
 const TelaLeiloeiro: React.FC = () => {
   const [nomeAtivo, setNomeAtivo] = useState('');
   const [precoInicial, setPrecoInicial] = useState('');

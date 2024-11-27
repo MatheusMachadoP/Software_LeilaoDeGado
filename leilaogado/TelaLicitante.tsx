@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { StyleSheet, View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import Web3 from 'web3';
 import { AbiItem } from 'web3-utils';
@@ -101,5 +102,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
+
 
 export default TelaLicitante;

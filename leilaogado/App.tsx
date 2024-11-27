@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import TelaInicial1 from './TelaInicial1';
@@ -6,6 +6,7 @@ import TelaEscolha from './TelaEscolha';
 import TelaCarteira from './TelaCarteira';
 import TelaLeiloeiro from './TelaLeiloeiro';
 import TelaLicitante from './TelaLicitante';
+import 'react-native-get-random-values';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -20,7 +21,7 @@ const Stack = createStackNavigator<RootStackParamList>();
 const App: React.FC = () => {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator screenOptions={{ headerShown: true }} initialRouteName="Home">
         <Stack.Screen name="Home" component={TelaInicial1} options={{ headerShown: false }} />
         <Stack.Screen name="Escolha" component={TelaEscolha} />
         <Stack.Screen name="Carteira" component={TelaCarteira} />
