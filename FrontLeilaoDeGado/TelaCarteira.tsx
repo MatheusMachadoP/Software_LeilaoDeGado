@@ -48,7 +48,7 @@ const TelaCarteira: React.FC<Props> = ({ route, navigation }) => {
       await AsyncStorage.setItem('walletAddress', manualAddress);
 
       // Enviar o endereço da carteira para o backend
-      await api.post('/api/usuarios/update-wallet-address', { userId, walletAddress: manualAddress });
+      await api.post('/usuarios/update-wallet-address', { userId, walletAddress: manualAddress });
 
       Alert.alert("Sucesso", "Carteira conectada com sucesso!");
     } catch (error) {

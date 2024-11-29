@@ -3,6 +3,8 @@ import { Request, Response, NextFunction, Router } from 'express';
 import { AppDataSource } from '../data-source';
 import { Usuario } from '../entity/Usuario';
 import bcrypt from 'bcryptjs';
+import authenticateJWT from '../middlewares/authenticateJWT';
+
 
 const router = Router();
 
@@ -96,6 +98,18 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
     next(error);
   }
 };
+
+// Rota para atualizar o endereço da carteira do usuário
+router.post('/update-wallet-address', (req: Request, res: Response, next: NextFunction) => {
+  if  (req) {
+	updateWalletAddress(req, res, next);
+  console.log("Carteira conectada com sucesso !")
+  } else {
+	res.status(401).send('Unauthorized');
+  }
+}); // POST /api/usuarios/update-wallet-address
+// Rota para remover o endereço da carteira do usuário
+router.post('/remove-wallet-address', removeWalletAddress);
 
 // Rota para criação de usuário com o middleware de validação
 router.post('/create', createUser);
