@@ -4,7 +4,7 @@
   "description": "Projeto de CRUD para leilão de gado usando Node.js, TypeORM, Express e PostgreSQL",
   "main": "src/index.ts",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "nodemon src/index.ts",
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "dev:server": "ts-node-dev --inspect --transpile-only --ignore-watch node_modules src/server.ts"
   },
