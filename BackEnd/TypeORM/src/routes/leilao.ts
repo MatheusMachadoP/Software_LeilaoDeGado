@@ -1,20 +1,19 @@
-// src/routes/leilao.ts
 import express from 'express';
-import { 
-  createLeilao, 
-  getLeiloesDisponiveis, 
-  getLeilaoById, 
-  participarLeilao 
-} from '../controllers/leilaoController';
-import { uploadMiddleware } from '../controllers/leilaoController'; // Importa de leilaoController.ts
+import { createLeilao, getLeiloesDisponiveis, getLeilaoById, participarLeilao, uploadMiddleware } from '../controllers/leilaoController';
 import authenticateJWT from '../middlewares/authenticateJWT';
 
 const router = express.Router();
 
-// Rotas
-router.post('/', authenticateJWT, uploadMiddleware, createLeilao); // POST /api/leiloes
-router.get('/disponiveis', getLeiloesDisponiveis); // GET /api/leiloes/disponiveis
-router.get('/:id', getLeilaoById); // GET /api/leiloes/:id
-router.post('/:id/participar', authenticateJWT, participarLeilao); // POST /api/leiloes/:id/participar
+// Rota para criar um leilão
+router.post('/', authenticateJWT, uploadMiddleware, createLeilao);
+
+// Rota para obter leilões disponíveis
+router.get('/disponiveis', getLeiloesDisponiveis);
+
+// Rota para obter detalhes do leilão por ID
+router.get('/:id', getLeilaoById);
+
+// Rota para participar do leilão
+router.post('/:id/participar', authenticateJWT, participarLeilao);
 
 export default router;

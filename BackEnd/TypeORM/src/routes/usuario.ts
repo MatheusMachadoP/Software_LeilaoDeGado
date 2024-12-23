@@ -1,6 +1,4 @@
-import express, { Router, Request, Response, NextFunction } from 'express';
-import { updateWalletAddress, removeWalletAddress } from '../controllers/usuario';
-import authenticateJWT from '../middlewares/authenticateJWT';
+import express, {  } from 'express';
 
 const router = express.Router();
 

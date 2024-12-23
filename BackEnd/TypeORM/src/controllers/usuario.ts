@@ -3,7 +3,6 @@ import { Request, Response, NextFunction, Router } from 'express';
 import { AppDataSource } from '../data-source';
 import { Usuario } from '../entity/Usuario';
 import bcrypt from 'bcryptjs';
-import authenticateJWT from '../middlewares/authenticateJWT';
 
 
 const router = Router();
@@ -101,7 +100,7 @@ export const createUser = async (req: Request, res: Response, next: NextFunction
 
 // Rota para atualizar o endereço da carteira do usuário
 router.post('/update-wallet-address', (req: Request, res: Response, next: NextFunction) => {
-  if  (req) {
+  if (req.body.user) {
 	updateWalletAddress(req, res, next);
   console.log("Carteira conectada com sucesso !")
   } else {

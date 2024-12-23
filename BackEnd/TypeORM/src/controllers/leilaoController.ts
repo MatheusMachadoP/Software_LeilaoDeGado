@@ -1,5 +1,3 @@
-// src/controllers/leilaoController.ts
-
 import { Request, Response, NextFunction } from 'express';
 import { AppDataSource } from '../data-source';
 import { Leilao, StatusLeilao } from '../entity/Leilao';

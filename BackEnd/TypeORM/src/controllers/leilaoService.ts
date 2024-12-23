@@ -1,15 +1,27 @@
 import { ethers } from 'ethers';
+import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import contractABI from './LeilaoABI.json';  // ABI do contrato gerado pelo Hardhat
+
+declare global {
+  interface Window {
+    ethereum: any;
+  }
+}
 
 const contractAddress = 'seu_endereco_do_contrato';
 
 export class LeilaoService {
-  private static provider: ethers.providers.JsonRpcProvider;
+  private static provider: ethers.JsonRpcProvider;
   private static contract: ethers.Contract;
+  static LeilaoService: Web3Provider;
 
-  static initialize() {
-    this.provider = new ethers.providers.Web3Provider(window.ethereum);
-    this.contract = new ethers.Contract(contractAddress, contractABI, this.provider.getSigner());
+  constructor() {
+    if (typeof window !== 'undefined' && window.ethereum) {
+      LeilaoService.provider = new Web3Provider(window.ethereum);
+      LeilaoService.contract = new ethers.Contract(contractAddress, contractABI, LeilaoService.provider.getSigner());
+    } else {
+      throw new Error('Ethereum provider is not available');
+    }
   }
 
   // Função para iniciar o leilão
