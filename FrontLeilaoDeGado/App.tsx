@@ -1,3 +1,4 @@
+import '@walletconnect/react-native-compat';
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -46,7 +47,7 @@ const App: React.FC = () => {
             shadowColor: 'transparent',
           },
           headerTintColor: '#BB86FC',
-          headerBackTitleVisible: false,
+          headerBackButtonDisplayMode: 'minimal',
           headerTitle: '',
         }}
       >
