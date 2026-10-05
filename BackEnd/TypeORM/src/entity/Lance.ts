@@ -13,6 +13,9 @@ export class Lance {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   dataHora: Date | undefined;
 
+  @Column({ type: 'text', nullable: true, name: 'tx_hash' })
+  txHash: string | undefined;
+
   @ManyToOne(() => Leilao, (leilao: Leilao) => leilao.lances)
   @JoinColumn({ name: 'leilao_id' })
   leilao: Leilao | undefined;

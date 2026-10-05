@@ -6,15 +6,14 @@ const config: HardhatUserConfig = {
   solidity: "0.8.24",
   networks: {
     hardhat: {},
-    ropsten: {
-      url: process.env.ROPSTEN_URL || "",
+    sepolia: {
+      url: process.env.SEPOLIA_RPC_URL || "",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
     },
-    // Adicione outras redes conforme necessário
   },
   typechain: {
     outDir: "typechain",
-    target: "ethers-v5",
+    target: "ethers-v6",
   },
 };
 

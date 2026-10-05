@@ -16,6 +16,7 @@
     "cors": "^2.8.5",
     "date-fns": "^3.6.0",
     "dotenv": "^10.0.0",
+    "ethers": "^6.17.0",
     "expo": "^51.0.0",
     "express": "^4.20.0",
     "jsonwebtoken": "^9.0.2",
@@ -44,4 +45,3 @@
   "author": "Matheus",
   "license": "MIT"
 }
-

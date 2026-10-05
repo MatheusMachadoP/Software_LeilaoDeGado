@@ -4,7 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 interface JwtPayload {
-  userId: number;
+  id: number;
   // Adicione outros campos conforme necessário
 }
 
@@ -19,8 +19,8 @@ const authenticateJWT = (req: Request, res: Response, next: NextFunction) => {
         return res.sendStatus(403);
       }
 
-      const { userId } = payload as JwtPayload;
-      req.user = { id: userId };
+      const { id } = payload as JwtPayload;
+      req.user = { id };
       next();
     });
   } else {

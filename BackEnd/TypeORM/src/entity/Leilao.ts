@@ -59,6 +59,12 @@ export class Leilao {
   @Column({ type: 'timestamp', nullable: true, name: 'data_termino' })
   dataTermino?: Date;
 
+  @Column({ type: 'text', nullable: true, name: 'endereco_contrato' })
+  enderecoContrato?: string;
+
+  @Column({ type: 'text', nullable: true, name: 'tx_hash_criacao' })
+  txHashCriacao?: string;
+
   @BeforeInsert()
   @BeforeUpdate()
   calcularDataTermino() {
